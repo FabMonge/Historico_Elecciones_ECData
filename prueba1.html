@@ -1,109 +1,56 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <title>Mapa GeoJSON - ECData</title>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa Interactivo de Perú - ECData</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        :root {
-            --color-base: #e0e0e0;
-            --color-hover: #ffcc00;
-            --color-select: #ce1126;
-            --color-texto: #333;
-        }
-
-        body {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: 'Helvetica', Arial, sans-serif;
-            background-color: #ffffff;
-        }
-
-        /* Contenedor Responsive */
-        .map-wrapper {
-            width: 100%;
-            max-width: 600px; /* Controla el tamaño máximo en desktop */
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        svg {
-            width: 100%;
-            height: auto; /* Mantiene la proporción */
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
-        }
-
-        /* Estilo de los departamentos */
-        .region {
-            fill: var(--color-base);
-            stroke: #fff;
-            stroke-width: 1;
-            cursor: pointer;
-            transition: fill 0.3s ease, stroke-width 0.2s;
-        }
-
-        .region:hover {
-            fill: var(--color-hover);
-            stroke-width: 2;
-        }
-
-        /* Clase cuando una región está seleccionada */
-        .region.selected {
-            fill: var(--color-select);
-            stroke: #000;
-            stroke-width: 2;
-        }
-
-        #info-box {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            min-height: 24px;
-            font-weight: bold;
-            color: var(--color-texto);
-        }
+        #map { height: 100vh; width: 100%; margin: 0; padding: 0; }
+        .info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
     </style>
 </head>
 <body>
-
-    <div class="map-wrapper">
-        <h2 style="text-align: center;">Selecciona una región</h2>
-        
-        <svg viewBox="0 0 400 550" xmlns="http://www.w3.org/2000/svg">
-            <path id="Loreto" class="region" d="M200,20 L280,50 L310,120 L280,180 L220,150 L180,80 Z" />
-            <path id="Piura" class="region" d="M50,120 L80,110 L90,140 L60,160 Z" />
-            <path id="Lima" class="region" d="M120,320 L150,330 L160,370 L130,380 Z" />
-            <path id="Cusco" class="region" d="M220,350 L270,340 L280,390 L240,410 Z" />
-            <path id="Arequipa" class="region" d="M180,420 L230,430 L210,480 L160,460 Z" />
-            <text x="50%" y="95%" text-anchor="middle" style="font-size: 12px; fill: #999;">Mapa base interactivo</text>
-        </svg>
-
-        <div id="info-box">Región: Ninguna</div>
-    </div>
+    <div id="map"></div>
 
     <script>
-        const regions = document.querySelectorAll('.region');
-        const infoBox = document.getElementById('info-box');
+        // Centramos el mapa en Perú
+        var map = L.map('map').setView([-9.19, -75.01], 6);
 
-        regions.forEach(region => {
-            region.addEventListener('click', function() {
-                // Quitar selección previa
-                regions.forEach(r => r.classList.remove('selected'));
-                
-                // Seleccionar la actual
-                this.classList.add('selected');
-                
-                // Actualizar texto
-                infoBox.textContent = `Región: ${this.id}`;
-                
-                // Log para debug (puedes usar esto para disparar otras funciones)
-                console.log("Región seleccionada:", this.id);
+        // Capa base (puedes usar una de MapBox o CartoDB)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // CARGAR TU GEOJSON
+        // Asegúrate de que el archivo se llame 'mapa.geojson' y esté en el mismo repo
+        fetch('mapa.geojson')
+            .then(response => response.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    style: function(feature) {
+                        return {
+                            fillColor: "#ce1126",
+                            weight: 1,
+                            opacity: 1,
+                            color: 'white',
+                            fillOpacity: 0.7
+                        };
+                    },
+                    onEachFeature: function (feature, layer) {
+                        // Si en R le pusiste nombres a las columnas, úsalas aquí
+                        layer.bindPopup("Distrito: " + (feature.properties.NOMBDIST || "Sin nombre"));
+                        
+                        layer.on('mouseover', function (e) {
+                            this.setStyle({ fillOpacity: 1, weight: 2 });
+                        });
+                        layer.on('mouseout', function (e) {
+                            this.setStyle({ fillOpacity: 0.7, weight: 1 });
+                        });
+                    }
+                }).addTo(map);
             });
-        });
     </script>
 </body>
 </html>
