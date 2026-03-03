@@ -1,55 +1,77 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Mapa GeoJSON - ECData</title>
+    <title>Evolución Electoral - ECData</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        #map { height: 100vh; width: 100%; margin: 0; padding: 0; }
-        .info { padding: 6px 8px; font: 14px/16px Arial, Helvetica, sans-serif; background: white; background: rgba(255,255,255,0.8); box-shadow: 0 0 15px rgba(0,0,0,0.2); border-radius: 5px; }
+        body { margin: 0; padding: 0; }
+        #map { height: 100vh; width: 100%; background: white; }
+        .etiqueta-periodo {
+            position: absolute; top: 20px; right: 20px; z-index: 1000;
+            background: white; padding: 10px 20px; border: 2px solid #ce1126;
+            font-family: Arial, sans-serif; font-weight: bold; font-size: 24px;
+        }
     </style>
 </head>
 <body>
+
     <div id="map"></div>
+    <div id="periodo-txt" class="etiqueta-periodo">1ra Vuelta 2011</div>
 
     <script>
-        // Centramos el mapa en Perú
-        var map = L.map('map').setView([-9.19, -75.01], 6);
+        // 1. Mapa FIJO y CENTRADO en Perú
+        var map = L.map('map', {
+            zoomControl: false, 
+            dragging: false, 
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            touchZoom: false
+        }).setView([-9.19, -75.01], 5.5); // Coordenadas para ver todo el Perú
 
-        // Capa base (puedes usar una de MapBox o CartoDB)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+        // 2. Definición de "Frames" de datos (puedes añadir más candidatos/colores)
+        // Colores de ejemplo: Rojo (#ce1126), Naranja (#ff8c00), Azul (#0047ab)
+        const elecciones = {
+            "2011": { "LIMA": "#ff8c00", "CUSCO": "#ce1126", "LORETO": "#ce1126" },
+            "2016": { "LIMA": "#ff8c00", "CUSCO": "#ff8c00", "LORETO": "#ff8c00" },
+            "2021": { "LIMA": "#0047ab", "CUSCO": "#ce1126", "LORETO": "#ce1126" }
+        };
 
-        // CARGAR TU GEOJSON
-        // Asegúrate de que el archivo se llame 'mapa.geojson' y esté en el mismo repo
+        const periodos = ["2011", "2016", "2021"];
+        let currentIndex = 0;
+        let geoJsonLayer;
+
+        // 3. Función para pintar el mapa
+        function estiloMapa(feature) {
+            let año = periodos[currentIndex];
+            let nombreDpto = feature.properties.NOMBDEP; // Ajustar según tu GeoJSON
+            return {
+                fillColor: elecciones[año][nombreDpto] || "#e0e0e0",
+                weight: 1,
+                opacity: 1,
+                color: 'white',
+                fillOpacity: 0.8
+            };
+        }
+
+        // 4. Carga del GeoJSON y Ciclo Automático
         fetch('mapa.geojson')
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                L.geoJSON(data, {
-                    style: function(feature) {
-                        return {
-                            fillColor: "#ce1126",
-                            weight: 1,
-                            opacity: 1,
-                            color: 'white',
-                            fillOpacity: 0.7
-                        };
-                    },
-                    onEachFeature: function (feature, layer) {
-                        // Si en R le pusiste nombres a las columnas, úsalas aquí
-                        layer.bindPopup("Distrito: " + (feature.properties.NOMBDIST || "Sin nombre"));
-                        
-                        layer.on('mouseover', function (e) {
-                            this.setStyle({ fillOpacity: 1, weight: 2 });
-                        });
-                        layer.on('mouseout', function (e) {
-                            this.setStyle({ fillOpacity: 0.7, weight: 1 });
-                        });
-                    }
-                }).addTo(map);
+                geoJsonLayer = L.geoJSON(data, { style: estiloMapa }).addTo(map);
+
+                // INTERVALO DE 2 SEGUNDOS
+                setInterval(() => {
+                    currentIndex = (currentIndex + 1) % periodos.length;
+                    
+                    // Actualizar Colores
+                    geoJsonLayer.setStyle(estiloMapa);
+                    
+                    // Actualizar Texto Superior
+                    document.getElementById('periodo-txt').innerText = `1ra Vuelta ${periodos[currentIndex]}`;
+                }, 2000);
             });
     </script>
 </body>
