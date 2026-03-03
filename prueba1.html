@@ -1,54 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Evolución Electoral - ECData</title>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolución Electoral Perú - ECData</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        body { margin: 0; padding: 0; }
-        #map { height: 100vh; width: 100%; background: white; }
-        .etiqueta-periodo {
-            position: absolute; top: 20px; right: 20px; z-index: 1000;
-            background: white; padding: 10px 20px; border: 2px solid #ce1126;
-            font-family: Arial, sans-serif; font-weight: bold; font-size: 24px;
+        /* Reset de estilos para pantalla completa */
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #ffffff; }
+        #map { width: 100%; height: 100vh; }
+
+        /* Etiqueta del año/periodo */
+        .year-label {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: 2px solid #ce1126;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
 
+    <div id="year-display" class="year-label">1ra Vuelta 2011</div>
     <div id="map"></div>
-    <div id="periodo-txt" class="etiqueta-periodo">1ra Vuelta 2011</div>
 
     <script>
-        // 1. Mapa FIJO y CENTRADO en Perú
+        // 1. CONFIGURACIÓN DEL MAPA (WIDE Y FIJO)
+        // Zoom 5 o 4.8 suele ser ideal para ver todo el Perú de forma "Wide"
         var map = L.map('map', {
-            zoomControl: false, 
-            dragging: false, 
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            touchZoom: false
-        }).setView([-9.19, -75.01], 5.5); // Coordenadas para ver todo el Perú
+            zoomControl: false,       // Deshabilita botones +/-
+            dragging: false,          // Bloquea movimiento con mouse
+            scrollWheelZoom: false,   // Bloquea zoom de rueda
+            doubleClickZoom: false,   // Bloquea doble click
+            touchZoom: false,         // Bloquea zoom táctil
+            attributionControl: false // Limpia la esquina inferior
+        }).setView([-9.19, -75.01], 5); // Centro geográfico aproximado de Perú
 
-        // 2. Definición de "Frames" de datos (puedes añadir más candidatos/colores)
-        // Colores de ejemplo: Rojo (#ce1126), Naranja (#ff8c00), Azul (#0047ab)
+        // 2. CAPA BASE (Mantiene el mapa limpio y minimalista)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+        // 3. DATOS DE LAS ELECCIONES (Ajusta los colores según los partidos)
         const elecciones = {
-            "2011": { "LIMA": "#ff8c00", "CUSCO": "#ce1126", "LORETO": "#ce1126" },
-            "2016": { "LIMA": "#ff8c00", "CUSCO": "#ff8c00", "LORETO": "#ff8c00" },
-            "2021": { "LIMA": "#0047ab", "CUSCO": "#ce1126", "LORETO": "#ce1126" }
+            "2011": { "LIMA": "#ff8c00", "CUSCO": "#ce1126", "PIURA": "#ff8c00", "LORETO": "#ce1126" },
+            "2016": { "LIMA": "#ff8c00", "CUSCO": "#ffcc00", "PIURA": "#ff8c00", "LORETO": "#ff8c00" },
+            "2021": { "LIMA": "#0047ab", "CUSCO": "#ce1126", "PIURA": "#ff8c00", "LORETO": "#ce1126" }
         };
 
         const periodos = ["2011", "2016", "2021"];
         let currentIndex = 0;
         let geoJsonLayer;
 
-        // 3. Función para pintar el mapa
-        function estiloMapa(feature) {
+        // 4. FUNCIÓN PARA APLICAR EL COLOR
+        function getStyle(feature) {
             let año = periodos[currentIndex];
-            let nombreDpto = feature.properties.NOMBDEP; // Ajustar según tu GeoJSON
+            // Importante: Verifica si tu GeoJSON usa NOMBDEP o NOMBDIST como conversamos antes
+            let nombreDpto = feature.properties.NOMBDEP || feature.properties.NOMBDIST; 
+            
             return {
-                fillColor: elecciones[año][nombreDpto] || "#e0e0e0",
+                fillColor: elecciones[año][nombreDpto] || "#d1d1d1", // Gris si no hay dato
                 weight: 1,
                 opacity: 1,
                 color: 'white',
@@ -56,23 +75,26 @@
             };
         }
 
-        // 4. Carga del GeoJSON y Ciclo Automático
+        // 5. CARGA DEL GEOJSON Y ANIMACIÓN
         fetch('mapa.geojson')
-            .then(res => res.json())
+            .then(response => response.json())
             .then(data => {
-                geoJsonLayer = L.geoJSON(data, { style: estiloMapa }).addTo(map);
+                geoJsonLayer = L.geoJSON(data, {
+                    style: getStyle
+                }).addTo(map);
 
                 // INTERVALO DE 2 SEGUNDOS
                 setInterval(() => {
                     currentIndex = (currentIndex + 1) % periodos.length;
                     
-                    // Actualizar Colores
-                    geoJsonLayer.setStyle(estiloMapa);
+                    // Actualizar los colores del mapa
+                    geoJsonLayer.setStyle(getStyle);
                     
-                    // Actualizar Texto Superior
-                    document.getElementById('periodo-txt').innerText = `1ra Vuelta ${periodos[currentIndex]}`;
+                    // Actualizar el texto del año
+                    document.getElementById('year-display').innerText = `1ra Vuelta ${periodos[currentIndex]}`;
                 }, 2000);
-            });
+            })
+            .catch(error => console.error('Error cargando el mapa:', error));
     </script>
 </body>
 </html>
