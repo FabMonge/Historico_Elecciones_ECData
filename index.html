@@ -3,94 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa Electoral Perú - ECData</title>
+    <title>Mapa Electoral Interactivo - ECData</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* Fondo blanco total */
-        body, html { 
-            margin: 0; 
-            padding: 0; 
-            height: 100%; 
-            overflow: hidden; 
-            background-color: #ffffff; 
-        }
-        #map { 
-            width: 100%; 
-            height: 100vh; 
-            background-color: #ffffff; /* Asegura que el contenedor sea blanco */
-        }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #ffffff; }
+        #map { width: 100%; height: 100vh; background-color: #ffffff; }
 
-        /* Etiqueta flotante */
         .year-label {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            background: white;
-            padding: 8px 16px;
-            border: 1px solid #000;
-            font-family: Arial, sans-serif;
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
+            position: absolute; top: 20px; right: 20px; z-index: 1000;
+            background: white; padding: 10px 20px; border: 2px solid #ce1126;
+            font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; color: #333;
+        }
+        
+        .legend-label {
+            position: absolute; z-index: 1000; font-family: Arial, sans-serif; 
+            font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase;
         }
     </style>
 </head>
 <body>
 
     <div id="year-display" class="year-label">1ra Vuelta 2011</div>
+    <div class="legend-label" style="bottom: 45px; left: 25px;">Extranjero (PEX)</div>
+    <div class="legend-label" style="top: 28%; left: 10%;">Callao (Zoom)</div>
     <div id="map"></div>
 
     <script>
-        // 1. CONFIGURACIÓN DEL MAPA FIJO
+        // 1. CONFIGURACIÓN DEL MAPA
         var map = L.map('map', {
-            zoomControl: false,
-            dragging: false,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            touchZoom: false,
-            attributionControl: false // Quitamos los créditos de Leaflet para limpieza total
-        }).setView([-9.19, -75.01], 5); // Vista wide de Perú
+            zoomControl: false, dragging: false, scrollWheelZoom: false,
+            doubleClickZoom: false, touchZoom: false, attributionControl: false
+        }).setView([-9.5, -78], 5.2); // Ajustado para dar espacio a los insets
 
-        // NOTA: HEMOS ELIMINADO L.tileLayer PARA QUE NO SE VEAN OTROS PAÍSES
-
-        // 2. DATOS DE LAS ELECCIONES
+        // 2. DATOS ELECTORALES (Simulacro, puedes editarlos)
         const elecciones = {
-            "2011": { "LIMA": "#ff8c00", "CUSCO": "#ce1126", "PIURA": "#ff8c00", "LORETO": "#ce1126" },
-            "2016": { "LIMA": "#ff8c00", "CUSCO": "#ffcc00", "PIURA": "#ff8c00", "LORETO": "#ff8c00" },
-            "2021": { "LIMA": "#0047ab", "CUSCO": "#ce1126", "PIURA": "#ff8c00", "LORETO": "#ce1126" }
+            "2011": { "LIMA": "#ff8c00", "CALLAO": "#ce1126", "EXTRANJERO": "#ff8c00", "CUSCO": "#ce1126" },
+            "2016": { "LIMA": "#ff8c00", "CALLAO": "#ffcc00", "EXTRANJERO": "#ffcc00", "CUSCO": "#ffcc00" },
+            "2021": { "LIMA": "#0047ab", "CALLAO": "#0047ab", "EXTRANJERO": "#0047ab", "CUSCO": "#ce1126" }
         };
 
         const periodos = ["2011", "2016", "2021"];
         let currentIndex = 0;
-        let geoJsonLayer;
+        let geoJsonLayer, callaoInset, pexLayer;
 
-        function getStyle(feature) {
+        function getStyle(name) {
             let año = periodos[currentIndex];
-            let nombreDpto = feature.properties.NOMBDEP || feature.properties.NOMBDIST; 
-            
             return {
-                fillColor: elecciones[año][nombreDpto] || "#eeeeee", // Gris muy claro si no hay dato
-                weight: 1.5,      // Grosor del borde
-                opacity: 1,
-                color: '#ffffff', // Bordes blancos entre departamentos
-                fillOpacity: 1    // Color sólido
+                fillColor: elecciones[año][name] || "#eeeeee",
+                weight: 1.5, opacity: 1, color: '#ffffff', fillOpacity: 1
             };
         }
 
-        // 3. CARGA DEL GEOJSON
-        fetch('mapa.geojson')
-            .then(response => response.json())
+        // 3. CARGA DE DATOS
+        fetch('peru_departamental_simple.geojson')
+            .then(res => res.json())
             .then(data => {
+                // Mapa Principal
                 geoJsonLayer = L.geoJSON(data, {
-                    style: getStyle
+                    style: function(f) { return getStyle(f.properties.NOMBDEP); },
+                    onEachFeature: function(f, l) {
+                        l.bindPopup("<b>" + f.properties.NOMBDEP + "</b>");
+                    }
                 }).addTo(map);
 
-                // ANIMACIÓN CADA 2 SEGUNDOS
+                // --- CREACIÓN DEL ZOOM DEL CALLAO ---
+                // Buscamos la geometría del Callao en tu GeoJSON
+                let callaoFeature = data.features.find(f => f.properties.NOMBDEP === "CALLAO");
+                
+                // Matriz para mover y agrandar el Callao (lo ponemos en el mar)
+                let callaoGeom = JSON.parse(JSON.stringify(callaoFeature.geometry)); // Clonar
+                const shift = [-83, -10]; // Nueva posición en el mar
+                const scale = 5; // 5 veces más grande
+                const center = [-77.12, -12.05]; // Centro real del Callao
+
+                function transform(coords) {
+                    if (Array.isArray(coords[0])) return coords.map(transform);
+                    return [
+                        shift[0] + (coords[0] - center[0]) * scale,
+                        shift[1] + (coords[1] - center[1]) * scale
+                    ];
+                }
+                callaoGeom.coordinates = transform(callaoGeom.coordinates);
+
+                callaoInset = L.geoJSON(callaoGeom, {
+                    style: getStyle("CALLAO")
+                }).addTo(map);
+
+                callaoInset.bindPopup("<b>Callao (Detalle)</b>");
+
+                // --- FLECHA HACIA EL CALLAO ---
+                var arrow = L.polyline([[-11, -80.5], [-11.9, -77.2]], {
+                    color: '#ccc', weight: 2, dashArray: '5, 5'
+                }).addTo(map);
+
+                // --- EXTRANJERO (PEX) ---
+                pexLayer = L.rectangle([[-16, -83.5], [-14, -80.5]], {
+                    ...getStyle("EXTRANJERO")
+                }).addTo(map);
+                pexLayer.bindPopup("<b>Peruanos en el Exterior</b>");
+
+                // 4. ANIMACIÓN
                 setInterval(() => {
                     currentIndex = (currentIndex + 1) % periodos.length;
-                    geoJsonLayer.setStyle(getStyle);
+                    
+                    geoJsonLayer.setStyle(f => getStyle(f.properties.NOMBDEP));
+                    callaoInset.setStyle(getStyle("CALLAO"));
+                    pexLayer.setStyle(getStyle("EXTRANJERO"));
+                    
                     document.getElementById('year-display').innerText = `1ra Vuelta ${periodos[currentIndex]}`;
                 }, 2000);
             });
