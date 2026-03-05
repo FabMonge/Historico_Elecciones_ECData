@@ -6,18 +6,23 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* 2. FONTO BLANCO RESTAURADO */
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: white; }
-        #map { width: 100%; height: 100vh; background-color: white; }
+        /* FONDO BLANCO TOTAL */
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #ffffff; }
+        #map { width: 100%; height: 100vh; background-color: #ffffff; }
         
+        /* ETIQUETA DE AÑO */
         .year-label {
             position: absolute; top: 20px; right: 20px; z-index: 1000;
-            background: white; padding: 10px; border: 1px solid #333;
+            background: white; padding: 10px; border: 1px solid #444;
             font-family: Arial, sans-serif; font-weight: bold; font-size: 22px;
+            color: #333;
         }
 
-        /* Redondeo para el cuadro PEX */
-        .pex-rounded { rx: 8; ry: 8; }
+        /* REDONDEO PEX */
+        .pex-rounded { rx: 10; ry: 10; }
+        
+        /* LIMPIEZA DE PANELES DE LEAFLET */
+        .leaflet-container { background: #fff !important; }
     </style>
 </head>
 <body>
@@ -25,11 +30,13 @@
     <div id="map"></div>
 
     <script>
+        // Inicialización del mapa (WIDE)
         var map = L.map('map', {
             zoomControl: false, dragging: false, scrollWheelZoom: false,
             doubleClickZoom: false, touchZoom: false, attributionControl: false
-        }).setView([-9.5, -78], 5.2);
+        }).setView([-9.5, -78.5], 5.2);
 
+        // DATA ELECTORAL
         const elecciones = {
             "2011": { "LIMA": "#ff8c00", "CALLAO": "#ce1126", "EXTRANJERO": "#ff8c00", "CUSCO": "#ce1126" },
             "2016": { "LIMA": "#ff8c00", "CALLAO": "#ffcc00", "EXTRANJERO": "#ffcc00", "CUSCO": "#ffcc00" },
@@ -40,42 +47,43 @@
         let currentIndex = 0;
         let geoJsonLayer, callaoInset, pexLayer;
 
-        // 1. BORDES MÁS FINOS Y ELEGANTES (Gris oscuro, no negro puro)
+        // ESTILO: BORDES GRISES FINOS (0.8px)
         function getStyle(name) {
             let n = name ? name.toUpperCase().trim() : "";
             let anio = periodos[currentIndex];
             return {
                 fillColor: elecciones[anio][n] || "#eeeeee",
-                weight: 0.8, // Grosor reducido
+                weight: 0.8, 
                 opacity: 1, 
-                color: "#444", // Gris oscuro profesional
+                color: "#444444", 
                 fillOpacity: 1
             };
         }
 
-        // 3. RESTAURACIÓN DE INTERACTIVIDAD (Popups)
+        // FUNCIÓN PARA POPUPS (INTERACTIVIDAD)
         function onEachFeature(feature, layer) {
             let nombre = feature.properties.NOMBDEP || "Región";
             layer.bindPopup("<b>" + nombre + "</b>", { closeButton: false });
             
-            // Efecto visual al pasar el mouse (opcional)
-            layer.on('mouseover', function() { this.setStyle({ weight: 2, color: '#000' }); });
-            layer.on('mouseout', function() { this.setStyle({ weight: 0.8, color: '#444' }); });
+            // Highlight al hacer click o pasar el mouse
+            layer.on('click', function() { this.openPopup(); });
         }
 
+        // CARGA DEL ARCHIVO
         fetch("mapa.geojson")
             .then(res => res.json())
             .then(data => {
+                // 1. MAPA PRINCIPAL
                 geoJsonLayer = L.geoJSON(data, {
                     style: function(f) { return getStyle(f.properties.NOMBDEP); },
-                    onEachFeature: onEachFeature // Activamos los clics/popups
+                    onEachFeature: onEachFeature
                 }).addTo(map);
 
-                // --- ZOOM CALLAO ---
+                // 2. ZOOM CALLAO (AGRANDADO Y CON CLIC)
                 let callaoF = data.features.find(f => f.properties.NOMBDEP === "CALLAO");
                 if (callaoF) {
                     let callaoGeom = JSON.parse(JSON.stringify(callaoF.geometry));
-                    const shift = [-82, -10], scale = 7, center = [-77.12, -12.05];
+                    const shift = [-83, -10], scale = 8, center = [-77.12, -12.05];
 
                     function transform(coords) {
                         if (Array.isArray(coords[0])) return coords.map(transform);
@@ -88,18 +96,21 @@
                         onEachFeature: function(f, l) { l.bindPopup("<b>CALLAO (Zoom)</b>"); }
                     }).addTo(map);
                     
-                    // Línea punteada sutil
-                    L.polyline([[-11.2, -80.2], [-11.9, -77.2]], {
-                        color: "#999", weight: 1, dashArray: "4, 4"
+                    // Línea punteada fina
+                    L.polyline([[-11.2, -80.5], [-11.9, -77.2]], {
+                        color: "#666", weight: 1, dashArray: "4, 4"
                     }).addTo(map);
                 }
 
-                // --- PEX (MÁS CERCA Y REDONDEADO) ---
-                pexLayer = L.rectangle([[-15.5, -81], [-13.5, -79.5]], getStyle("EXTRANJERO")).addTo(map);
+                // 3. PEX (REDONDEADO Y CERCANO)
+                pexLayer = L.rectangle([[-15.5, -81.5], [-13.5, -79.5]], getStyle("EXTRANJERO")).addTo(map);
                 pexLayer.bindPopup("<b>PERUANOS EN EL EXTERIOR</b>");
-                pexLayer.getElement().classList.add('pex-rounded');
+                
+                // Aplicar redondeo
+                const pexEl = pexLayer.getElement();
+                if(pexEl) pexEl.classList.add('pex-rounded');
 
-                // ANIMACIÓN
+                // ANIMACIÓN CADA 2 SEGUNDOS
                 setInterval(() => {
                     currentIndex = (currentIndex + 1) % periodos.length;
                     geoJsonLayer.setStyle(f => getStyle(f.properties.NOMBDEP));
