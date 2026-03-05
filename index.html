@@ -3,56 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECData - Histórico Electoral</title>
+    <title>ECData - Visualización Electoral</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <div id="top-legend" class="top-legend-container"></div>
-
     <div id="year-display" class="year-label">Cargando...</div>
+
+    <div id="cand-1" class="candidate-big pos-left"></div>
+    <div id="cand-2" class="candidate-big pos-right"></div>
+    <div id="bottom-candidates" class="bottom-legend-container"></div>
+
     <div id="map"></div>
 
     <script>
         var map = L.map('map', {
             zoomControl: false, dragging: false, scrollWheelZoom: false,
-            doubleClickZoom: false, touchZoom: false, attributionControl: false
-        }).setView([-9.5, -78.5], 5.2);
+            doubleClickZoom: false, touchZoom: false, attributionControl: false,
+            zoomSnap: 0 
+        }).setView([-9.2, -76.5], 5.55);
 
-        // DATA EXTENDIDA CON CANDIDATOS Y % (Simulacro 2021)
         const elecciones = {
             "2021 - 1ra Vuelta": {
                 mapa: {
-                    "AMAZONAS": "#ce1126", "ANCASH": "#ce1126", "APURIMAC": "#ce1126", "AREQUIPA": "#ce1126",
-                    "AYACUCHO": "#ce1126", "CAJAMARCA": "#ce1126", "CUSCO": "#ce1126", "HUANCAVELICA": "#ce1126",
-                    "HUANUCO": "#ce1126", "ICA": "#ff8c00", "JUNIN": "#ce1126", "LA LIBERTAD": "#0047ab",
-                    "LAMBAYEQUE": "#ff8c00", "LIMA": "#e91e63", "LORETO": "#ff8c00", "MADRE DE DIOS": "#ce1126",
-                    "MOQUEGUA": "#ce1126", "PASCO": "#ce1126", "PIURA": "#ff8c00", "PUNO": "#ce1126",
-                    "SAN MARTIN": "#ce1126", "TACNA": "#ce1126", "TUMBES": "#ff8c00", "CALLAO": "#ff8c00",
-                    "UCAYALI": "#ff8c00", "EXTRANJERO": "#00bfff"
+                    "AMAZONAS": { color: "#ce1126", partido: "Perú Libre", pct: "25.3%" },
+                    "ANCASH": { color: "#ce1126", partido: "Perú Libre", pct: "23.4%" },
+                    "APURIMAC": { color: "#ce1126", partido: "Perú Libre", pct: "53.1%" },
+                    "AREQUIPA": { color: "#ce1126", partido: "Perú Libre", pct: "32.2%" },
+                    "AYACUCHO": { color: "#ce1126", partido: "Perú Libre", pct: "51.8%" },
+                    "CAJAMARCA": { color: "#ce1126", partido: "Perú Libre", pct: "44.1%" },
+                    "CALLAO": { color: "#ff8c00", partido: "Fuerza Popular", pct: "15.1%" },
+                    "CUSCO": { color: "#ce1126", partido: "Perú Libre", pct: "38.2%" },
+                    "HUANCAVELICA": { color: "#ce1126", partido: "Perú Libre", pct: "53.6%" },
+                    "HUANUCO": { color: "#ce1126", partido: "Perú Libre", pct: "37.5%" },
+                    "ICA": { color: "#ff8c00", partido: "Fuerza Popular", pct: "14.5%" },
+                    "JUNIN": { color: "#ce1126", partido: "Perú Libre", pct: "23.1%" },
+                    "LA LIBERTAD": { color: "#0047ab", partido: "Alianza para el Progreso", pct: "15.9%" },
+                    "LAMBAYEQUE": { color: "#ff8c00", partido: "Fuerza Popular", pct: "21.1%" },
+                    "LIMA": { color: "#e91e63", partido: "Avanza País", pct: "16.4%" },
+                    "LORETO": { color: "#ff8c00", partido: "Fuerza Popular", pct: "17.4%" },
+                    "MADRE DE DIOS": { color: "#ce1126", partido: "Perú Libre", pct: "36.8%" },
+                    "MOQUEGUA": { color: "#ce1126", partido: "Perú Libre", pct: "34.4%" },
+                    "PASCO": { color: "#ce1126", partido: "Perú Libre", pct: "34.1%" },
+                    "PIURA": { color: "#ff8c00", partido: "Fuerza Popular", pct: "24.8%" },
+                    "PUNO": { color: "#ce1126", partido: "Perú Libre", pct: "47.5%" },
+                    "SAN MARTIN": { color: "#ce1126", partido: "Perú Libre", pct: "22.2%" },
+                    "TACNA": { color: "#ce1126", partido: "Perú Libre", pct: "33.5%" },
+                    "TUMBES": { color: "#ff8c00", partido: "Fuerza Popular", pct: "36.1%" },
+                    "UCAYALI": { color: "#ff8c00", partido: "Fuerza Popular", pct: "20.7%" },
+                    "EXTRANJERO": { color: "#00bfff", partido: "Renovación Popular", pct: "26.3%" }
                 },
-                top: [
-                    { nombre: "Pedro Castillo", partido: "Perú Libre", pct: "18.9%", color: "#ce1126", foto: true },
-                    { nombre: "Keiko Fujimori", partido: "Fuerza Popular", pct: "13.4%", color: "#ff8c00", foto: true },
-                    { nombre: "R. López Aliaga", partido: "Renovación Popular", pct: "11.7%", color: "#00bfff", foto: true },
-                    { nombre: "Hernando de Soto", partido: "Avanza País", pct: "11.6%", color: "#e91e63", foto: false }
+                candidatos: [
+                    { nombre: "Pedro Castillo", partido: "Perú Libre", pct: "18.9%", color: "#ce1126" },
+                    { nombre: "Keiko Fujimori", partido: "Fuerza Popular", pct: "13.4%", color: "#ff8c00" },
+                    { nombre: "R. López Aliaga", partido: "Renovación Popular", pct: "11.7%", color: "#00bfff" },
+                    { nombre: "Hernando de Soto", partido: "Avanza País", pct: "11.6%", color: "#e91e63" }
                 ]
             },
             "2021 - 2da Vuelta": {
                 mapa: {
-                    "AMAZONAS": "#ce1126", "ANCASH": "#ce1126", "APURIMAC": "#ce1126", "AREQUIPA": "#ce1126",
-                    "AYACUCHO": "#ce1126", "CAJAMARCA": "#ce1126", "CUSCO": "#ce1126", "HUANCAVELICA": "#ce1126",
-                    "HUANUCO": "#ce1126", "ICA": "#ff8c00", "JUNIN": "#ce1126", "LA LIBERTAD": "#ff8c00",
-                    "LAMBAYEQUE": "#ff8c00", "LIMA": "#ff8c00", "LORETO": "#ff8c00", "MADRE DE DIOS": "#ce1126",
-                    "MOQUEGUA": "#ce1126", "PASCO": "#ce1126", "PIURA": "#ff8c00", "PUNO": "#ce1126",
-                    "SAN MARTIN": "#ce1126", "TACNA": "#ce1126", "TUMBES": "#ff8c00", "CALLAO": "#ff8c00",
-                    "UCAYALI": "#ff8c00", "EXTRANJERO": "#ff8c00"
+                    "AMAZONAS": { color: "#ce1126", partido: "Perú Libre", pct: "66.5%" },
+                    "ANCASH": { color: "#ce1126", partido: "Perú Libre", pct: "59.2%" },
+                    "APURIMAC": { color: "#ce1126", partido: "Perú Libre", pct: "81.5%" },
+                    "AREQUIPA": { color: "#ce1126", partido: "Perú Libre", pct: "64.6%" },
+                    "AYACUCHO": { color: "#ce1126", partido: "Perú Libre", pct: "82.2%" },
+                    "CAJAMARCA": { color: "#ce1126", partido: "Perú Libre", pct: "71.3%" },
+                    "CALLAO": { color: "#ff8c00", partido: "Fuerza Popular", pct: "67.2%" },
+                    "CUSCO": { color: "#ce1126", partido: "Perú Libre", pct: "83.1%" },
+                    "HUANCAVELICA": { color: "#ce1126", partido: "Perú Libre", pct: "84.8%" },
+                    "HUANUCO": { color: "#ce1126", partido: "Perú Libre", pct: "67.6%" },
+                    "ICA": { color: "#ff8c00", partido: "Fuerza Popular", pct: "52.8%" },
+                    "JUNIN": { color: "#ce1126", partido: "Perú Libre", pct: "57.8%" },
+                    "LA LIBERTAD": { color: "#ff8c00", partido: "Fuerza Popular", pct: "59.9%" },
+                    "LAMBAYEQUE": { color: "#ff8c00", partido: "Fuerza Popular", pct: "58.9%" },
+                    "LIMA": { color: "#ff8c00", partido: "Fuerza Popular", pct: "65.7%" },
+                    "LORETO": { color: "#ff8c00", partido: "Fuerza Popular", pct: "60.9%" },
+                    "MADRE DE DIOS": { color: "#ce1126", partido: "Perú Libre", pct: "71.1%" },
+                    "MOQUEGUA": { color: "#ce1126", partido: "Perú Libre", pct: "73.1%" },
+                    "PASCO": { color: "#ce1126", partido: "Perú Libre", pct: "65.4%" },
+                    "PIURA": { color: "#ff8c00", partido: "Fuerza Popular", pct: "60.1%" },
+                    "PUNO": { color: "#ce1126", partido: "Perú Libre", pct: "89.3%" },
+                    "SAN MARTIN": { color: "#ce1126", partido: "Perú Libre", pct: "55.1%" },
+                    "TACNA": { color: "#ce1126", partido: "Perú Libre", pct: "72.6%" },
+                    "TUMBES": { color: "#ff8c00", partido: "Fuerza Popular", pct: "66.5%" },
+                    "UCAYALI": { color: "#ff8c00", partido: "Fuerza Popular", pct: "55.3%" },
+                    "EXTRANJERO": { color: "#ff8c00", partido: "Fuerza Popular", pct: "66.5%" }
                 },
-                top: [
-                    { nombre: "Pedro Castillo", partido: "Perú Libre", pct: "50.1%", color: "#ce1126", foto: true },
-                    { nombre: "Keiko Fujimori", partido: "Fuerza Popular", pct: "49.8%", color: "#ff8c00", foto: true }
+                candidatos: [
+                    { nombre: "Pedro Castillo", partido: "Perú Libre", pct: "50.1%", color: "#ce1126" },
+                    { nombre: "Keiko Fujimori", partido: "Fuerza Popular", pct: "49.8%", color: "#ff8c00" }
                 ]
             }
         };
@@ -63,39 +104,84 @@
 
         function getStyle(name) {
             let n = name ? name.toUpperCase().trim() : "";
-            let anio = periodos[currentIndex];
+            let data = elecciones[periodos[currentIndex]].mapa[n];
             return {
-                fillColor: elecciones[anio].mapa[n] || "#eeeeee",
+                fillColor: data ? data.color : "#eeeeee",
                 weight: 0.8, opacity: 1, color: "#444444", fillOpacity: 1
             };
         }
 
-        function updateTopLegend() {
-            const anio = periodos[currentIndex];
-            const candidatos = elecciones[anio].top;
-            const container = document.getElementById("top-legend");
-            container.innerHTML = "";
-
-            candidatos.forEach(cand => {
-                const card = document.createElement("div");
-                card.className = "candidate-card";
-                
-                // Mostrar círculo solo si tiene 'foto: true'
-                const photoHtml = cand.foto ? `<div class="photo-circle"></div>` : `<div style="width:12px"></div>`;
-                
-                card.innerHTML = `
-                    ${photoHtml}
-                    <div class="candidate-info">
-                        <span class="candidate-name">${cand.nombre}</span>
-                        <span class="party-name">${cand.party || cand.partido}</span>
-                        <div class="percentage-box">
-                            <div class="color-dot" style="background: ${cand.color}"></div>
-                            <span class="percentage">${cand.pct}</span>
-                        </div>
-                    </div>
+        // POPUPS DE REGIONES
+        function onEachFeature(feature, layer) {
+            let n = "CALLAO";
+            if (feature && feature.properties && feature.properties.NOMBDEP) {
+                n = feature.properties.NOMBDEP.toUpperCase().trim();
+            }
+            let data = elecciones[periodos[currentIndex]].mapa[n];
+            
+            if (data) {
+                let popupContent = `
+                    <div class="popup-region">${n}</div>
+                    <div class="popup-party">${data.partido}</div>
+                    <div class="popup-pct">${data.pct} <span class="popup-pct-label">(votos emitidos)</span></div>
                 `;
-                container.appendChild(card);
-            });
+                layer.bindPopup(popupContent, { closeButton: false });
+            }
+        }
+
+        // PRINCIPIO DRY + CARGA DE FOTOS PNG
+        function createCard(cand, type) {
+            const isBig = type === 'big';
+            const sizeClass = isBig ? 'photo-big' : 'photo-small';
+            
+            // Lógica para formatear el nombre (Ej: "R. López Aliaga" -> "r_lopez_aliaga")
+            let nombreLimpio = cand.nombre.toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Quita tildes
+                .replace(/\./g, '') // Quita puntos
+                .replace(/\s+/g, '_'); // Cambia espacios por guiones bajos
+            
+            // Busca la foto en formato PNG
+            let rutaFoto = `fotos/${nombreLimpio}.png`;
+            const photoStyle = `background-image: url('${rutaFoto}'); background-size: cover; background-position: center top;`;
+
+            // Estilos para distinguir tarjetas grandes de pequeñas
+            const containerStyle = isBig ? '' : 'style="align-items: flex-start; text-align: left;"';
+            const nameStyle = isBig ? '' : 'style="font-size: 16px;"';
+            const partyStyle = isBig ? '' : 'style="font-size: 9px;"';
+            const pctStyle = isBig ? '' : 'style="font-size: 20px;"';
+            const dotStyle = isBig ? '' : 'margin-left: 0; margin-right: 8px;';
+
+            return `
+                <div class="${sizeClass}" style="${photoStyle}"></div>
+                <div class="cand-info-container" ${containerStyle}>
+                    <span class="cand-name" ${nameStyle}>${cand.nombre}</span>
+                    <span class="cand-party" ${partyStyle}>${cand.partido}</span>
+                    <div class="cand-pct" ${pctStyle}>
+                        <div class="dot" style="background:${cand.color}; ${dotStyle}"></div>
+                        <span>${cand.pct}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ACTUALIZA LAS TARJETAS DINÁMICAMENTE
+        function updateLegend() {
+            const data = elecciones[periodos[currentIndex]];
+            
+            document.getElementById("cand-1").innerHTML = createCard(data.candidatos[0], 'big');
+            document.getElementById("cand-2").innerHTML = createCard(data.candidatos[1], 'big');
+            
+            const bottom = document.getElementById("bottom-candidates");
+            bottom.innerHTML = "";
+
+            if (data.candidatos.length > 2) {
+                for(let i=2; i < data.candidatos.length; i++) {
+                    const div = document.createElement("div");
+                    div.className = "candidate-small";
+                    div.innerHTML = createCard(data.candidatos[i], 'small');
+                    bottom.appendChild(div);
+                }
+            }
         }
 
         fetch("mapa.geojson?v=" + Date.now())
@@ -103,42 +189,67 @@
             .then(data => {
                 geoJsonLayer = L.geoJSON(data, {
                     style: f => getStyle(f.properties.NOMBDEP),
-                    onEachFeature: (f, l) => { l.bindPopup("<b>" + f.properties.NOMBDEP + "</b>"); }
+                    onEachFeature: onEachFeature
                 }).addTo(map);
 
+                // CALLAO INSET
                 let callaoF = data.features.find(f => f.properties.NOMBDEP === "CALLAO");
                 if (callaoF) {
                     let callaoGeom = JSON.parse(JSON.stringify(callaoF.geometry));
-                    const shift = [-81.9, -11.5], scale = 12, center = [-77.12, -12.05];
+                    const shift = [-82.5, -11.5], scale = 12, center = [-77.12, -12.05];
                     function transform(coords) {
                         if (Array.isArray(coords[0])) return coords.map(transform);
                         return [shift[0] + (coords[0] - center[0]) * scale, shift[1] + (coords[1] - center[1]) * scale];
                     }
                     callaoGeom.coordinates = transform(callaoGeom.coordinates);
-                    callaoInset = L.geoJSON(callaoGeom, { style: getStyle("CALLAO") }).addTo(map);
-                    L.polyline([[-10.4, -81.5], [-12.05, -77.12]], { color: "#444", weight: 1.2, dashArray: "5, 5" }).addTo(map);
+                    callaoInset = L.geoJSON(callaoGeom, { 
+                        style: getStyle("CALLAO"),
+                        onEachFeature: onEachFeature 
+                    }).addTo(map);
+                    L.polyline([[-10.8, -82.2], [-12.05, -77.50]], { color: "#444", weight: 1.2, dashArray: "5, 5" }).addTo(map);
+                    var callaoLabelIcon = L.divIcon({ className: 'pex-label', html: 'CALLAO', iconSize: [100, 20], iconAnchor: [50, 10] });
+                    L.marker([-8.5, -82.75], { icon: callaoLabelIcon, interactive: false }).addTo(map);
                 }
 
-                pexLayer = L.rectangle([[-16, -83.5], [-14.5, -79.5]], getStyle("EXTRANJERO")).addTo(map);
-                var pexLabelIcon = L.divIcon({ 
-                    className: 'pex-label', 
-                    html: 'Peruanos en el extranjero', 
-                    iconSize: [160, 20], 
-                    iconAnchor: [80, 10] 
+                // PEX RECTÁNGULO
+                pexLayer = L.rectangle([[-17.5, -84], [-15.5, -79]], getStyle("EXTRANJERO")).addTo(map);
+                pexLayer.on('click', function() {
+                    let d = elecciones[periodos[currentIndex]].mapa["EXTRANJERO"];
+                    if (d) {
+                        let content = `
+                            <div class="popup-region">EXTRANJERO</div>
+                            <div class="popup-party">${d.partido}</div>
+                            <div class="popup-pct">${d.pct} <span class="popup-pct-label">(votos emitidos)</span></div>
+                        `;
+                        L.popup().setLatLng([-16.5, -81.5]).setContent(content).openOn(map);
+                    }
                 });
-                L.marker([-14.1, -81.5], { icon: pexLabelIcon, interactive: false }).addTo(map);
 
-                updateTopLegend();
+                var pexLabelIcon = L.divIcon({ className: 'pex-label', html: 'Peruanos en el extranjero', iconSize: [160, 20], iconAnchor: [80, 10] });
+                L.marker([-14.7, -81.5], { icon: pexLabelIcon, interactive: false }).addTo(map);
+
+                updateLegend();
                 document.getElementById("year-display").innerText = periodos[currentIndex];
 
+                // BUCLE DE ANIMACIÓN
                 setInterval(() => {
                     currentIndex = (currentIndex + 1) % periodos.length;
-                    geoJsonLayer.setStyle(f => getStyle(f.properties.NOMBDEP));
-                    if (callaoInset) callaoInset.setStyle(getStyle("CALLAO"));
-                    if (pexLayer) pexLayer.setStyle(getStyle("EXTRANJERO"));
+                    
                     document.getElementById("year-display").innerText = periodos[currentIndex];
-                    updateTopLegend();
-                }, 3000);
+
+                    geoJsonLayer.setStyle(layerFeature => getStyle(layerFeature.properties.NOMBDEP));
+                    geoJsonLayer.eachLayer(layer => onEachFeature(layer.feature, layer));
+
+                    if (callaoInset) {
+                        callaoInset.setStyle(getStyle("CALLAO"));
+                        callaoInset.eachLayer(layer => onEachFeature(layer.feature, layer));
+                    }
+                    
+                    if (pexLayer) pexLayer.setStyle(getStyle("EXTRANJERO"));
+
+                    updateLegend();
+                    
+                }, 5000);
             });
     </script>
 </body>
