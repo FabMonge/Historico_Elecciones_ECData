@@ -1,10 +1,9 @@
 /* RESET Y FONDO BLANCO */
 body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden;
+    margin: 0; padding: 0;
+    height: 100%; overflow: hidden;
     background-color: #ffffff;
+    font-family: 'Arial', sans-serif;
 }
 
 #map {
@@ -13,106 +12,185 @@ body, html {
     background-color: #ffffff !important;
 }
 
-/* LEYENDA SUPERIOR (CABECERA DINÁMICA) */
-.top-legend-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 2000;
-    background: rgba(255, 255, 255, 0.95);
-    display: flex;
-    justify-content: center;
-    padding: 15px 0;
-    border-bottom: 1px solid #ddd;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.candidate-card {
-    display: flex;
-    align-items: center;
-    margin: 0 20px;
-    min-width: 180px;
-}
-
-.photo-circle {
-    width: 50px;
-    height: 50px;
-    background-color: #ccc; /* Círculo gris para la foto */
-    border-radius: 50%;
-    margin-right: 12px;
-    flex-shrink: 0;
-    border: 2px solid #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.candidate-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.candidate-name {
-    font-family: Arial, sans-serif;
-    font-weight: bold;
-    font-size: 16px;
-    color: #000;
-    line-height: 1.1;
-}
-
-.party-name {
-    font-family: Arial, sans-serif;
-    font-size: 11px;
-    color: #666;
-    text-transform: uppercase;
-    margin: 2px 0;
-}
-
-.percentage-box {
-    display: flex;
-    align-items: center;
-    margin-top: 2px;
-}
-
-.color-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 2px;
-    margin-right: 5px;
-}
-
-.percentage {
-    font-family: Arial, sans-serif;
-    font-weight: bold;
-    font-size: 14px;
-    color: #333;
-}
-
-/* ETIQUETA DE AÑO (Movida para no estorbar) */
+/* INDICADOR DE ELECCIÓN */
 .year-label {
     position: absolute;
-    top: 85px; /* Bajó para dejar espacio a la leyenda */
-    right: 20px;
-    z-index: 1000;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3000;
     background: white;
-    padding: 8px 12px;
-    border: 1px solid #444;
-    font-family: Arial, sans-serif;
-    font-weight: bold;
+    padding: 10px 20px;
+    border: 1.5px solid #000;
+    font-weight: 900;
     font-size: 18px;
-    color: #333;
-}
-
-/* ETIQUETA PEX (SIN CUADRO) */
-.pex-label {
-    font-family: Arial, sans-serif;
-    font-weight: bold;
-    font-size: 11px;
-    color: #333;
-    white-space: nowrap;
+    color: #000;
     text-transform: uppercase;
-    /* Se eliminó background y border */
+    box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
 }
 
-.leaflet-container {
-    background: #fff !important;
+/* CANDIDATOS PROTAGONISTAS */
+.candidate-big {
+    position: absolute;
+    z-index: 2500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 250px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+}
+
+.pos-left { left: 8%; }
+.pos-right { right: 8%; }
+
+/* FOTOS PRINCIPALES AUMENTADAS Y SIN BORDE */
+.photo-big {
+    width: 170px; 
+    height: 170px;
+    background-color: #d1d1d1;
+    border-radius: 50%;
+    border: none !important; /* Fuerza la eliminación del borde negro */
+    margin-bottom: 12px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.cand-info-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cand-name { 
+    font-weight: 900; 
+    font-size: 24px; 
+    color: #000; 
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.cand-party { 
+    font-size: 12px; 
+    color: #666; 
+    text-transform: uppercase; 
+    font-weight: 400;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+}
+
+.cand-pct { 
+    font-weight: 900; 
+    font-size: 32px; 
+    display: flex; 
+    align-items: center; 
+    color: #000;
+}
+
+.dot { 
+    width: 16px; height: 16px; 
+    border-radius: 3px; 
+    margin: 0 12px; 
+}
+
+/* CANDIDATOS SECUNDARIOS */
+.bottom-legend-container {
+    position: absolute;
+    bottom: 25px; 
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2500;
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap; /* Evita que se salgan de la pantalla */
+    justify-content: center;
+}
+
+.candidate-small {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.8);
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+/* FOTOS PEQUEÑAS SIN BORDE */
+.photo-small {
+    width: 50px; 
+    height: 50px;
+    background-color: #e0e0e0;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: none !important; /* Fuerza la eliminación del borde negro */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+}
+
+/* ETIQUETAS PEX Y CALLAO */
+.pex-label { 
+    font-weight: 900; 
+    font-size: 11px; 
+    color: #333; 
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 1px;
+    pointer-events: none;
+}
+
+/* FORMATO POPUP: LIMPIO Y MINIMALISTA */
+.leaflet-popup-content-wrapper {
+    border-radius: 0px;
+    border: 1px solid #000;
+    padding: 2px;
+}
+
+.popup-region {
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 5px;
+    padding-bottom: 3px;
+    display: block;
+}
+
+.popup-party {
+    font-size: 10px;
+    color: #666;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.popup-pct {
+    font-size: 18px;
+    font-weight: 900;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.popup-pct-label {
+    font-size: 10px;
+    font-weight: 400;
+    color: #444;
+}
+
+.leaflet-container { background: #fff !important; }
+
+/* REGLAS RESPONSIVAS (Mobile First / Adaptación) */
+@media (max-width: 768px) {
+    .candidate-big {
+        width: 120px;
+        top: auto;
+        bottom: 120px;
+        transform: translateY(0);
+    }
+    .photo-big { 
+        width: 100px; 
+        height: 100px; 
+    }
+    .cand-name { font-size: 14px; }
+    .cand-pct { font-size: 20px; }
+    .bottom-legend-container { gap: 10px; bottom: 10px; }
+    .photo-small { width: 35px; height: 35px; }
 }
