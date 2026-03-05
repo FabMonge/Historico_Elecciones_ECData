@@ -3,126 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECData - Mapa Electoral Interactivo</title>
-    
+    <title>ECData - Histórico Electoral</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <style>
-        /* 1. RESET Y FONDO BLANCO */
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background-color: #ffffff; }
-        #map { width: 100%; height: 100vh; background-color: #ffffff !important; }
-        
-        /* 2. ETIQUETA DE AÑO (ESTILO EL COMERCIO) */
-        .year-label {
-            position: absolute; top: 20px; right: 20px; z-index: 1000;
-            background: white; padding: 10px; border: 1px solid #444;
-            font-family: Arial, sans-serif; font-weight: bold; font-size: 22px;
-            color: #333; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-        }
-
-        /* 3. BORDES REDONDOS PARA PEX */
-        .pex-rounded { rx: 15; ry: 15; stroke-linejoin: round; }
-        
-        /* LIMPIEZA DE CONTENEDORES LEAFLET */
-        .leaflet-container { background: #fff !important; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <div id="year-display" class="year-label">1ra Vuelta 2011</div>
+    <div id="top-legend" class="top-legend-container"></div>
+
+    <div id="year-display" class="year-label">Cargando...</div>
     <div id="map"></div>
 
     <script>
-        // --- CONFIGURACIÓN DEL MAPA ---
         var map = L.map('map', {
             zoomControl: false, dragging: false, scrollWheelZoom: false,
             doubleClickZoom: false, touchZoom: false, attributionControl: false
         }).setView([-9.5, -78.5], 5.2);
 
-        // --- DATOS DE LAS ELECCIONES (Placeholders) ---
-        // Aquí puedes agregar todos los departamentos (AREQUIPA, PIURA, etc.)
+        // DATA EXTENDIDA CON CANDIDATOS Y % (Simulacro 2021)
         const elecciones = {
-            "2011": { "LIMA": "#ff8c00", "CALLAO": "#ce1126", "EXTRANJERO": "#ff8c00", "CUSCO": "#ce1126" },
-            "2016": { "LIMA": "#ff8c00", "CALLAO": "#ffcc00", "EXTRANJERO": "#ffcc00", "CUSCO": "#ffcc00" },
-            "2021": { "LIMA": "#0047ab", "CALLAO": "#0047ab", "EXTRANJERO": "#0047ab", "CUSCO": "#ce1126" }
+            "2021 - 1ra Vuelta": {
+                mapa: {
+                    "AMAZONAS": "#ce1126", "ANCASH": "#ce1126", "APURIMAC": "#ce1126", "AREQUIPA": "#ce1126",
+                    "AYACUCHO": "#ce1126", "CAJAMARCA": "#ce1126", "CUSCO": "#ce1126", "HUANCAVELICA": "#ce1126",
+                    "HUANUCO": "#ce1126", "ICA": "#ff8c00", "JUNIN": "#ce1126", "LA LIBERTAD": "#0047ab",
+                    "LAMBAYEQUE": "#ff8c00", "LIMA": "#e91e63", "LORETO": "#ff8c00", "MADRE DE DIOS": "#ce1126",
+                    "MOQUEGUA": "#ce1126", "PASCO": "#ce1126", "PIURA": "#ff8c00", "PUNO": "#ce1126",
+                    "SAN MARTIN": "#ce1126", "TACNA": "#ce1126", "TUMBES": "#ff8c00", "CALLAO": "#ff8c00",
+                    "UCAYALI": "#ff8c00", "EXTRANJERO": "#00bfff"
+                },
+                top: [
+                    { nombre: "Pedro Castillo", partido: "Perú Libre", pct: "18.9%", color: "#ce1126", foto: true },
+                    { nombre: "Keiko Fujimori", partido: "Fuerza Popular", pct: "13.4%", color: "#ff8c00", foto: true },
+                    { nombre: "R. López Aliaga", partido: "Renovación Popular", pct: "11.7%", color: "#00bfff", foto: true },
+                    { nombre: "Hernando de Soto", partido: "Avanza País", pct: "11.6%", color: "#e91e63", foto: false }
+                ]
+            },
+            "2021 - 2da Vuelta": {
+                mapa: {
+                    "AMAZONAS": "#ce1126", "ANCASH": "#ce1126", "APURIMAC": "#ce1126", "AREQUIPA": "#ce1126",
+                    "AYACUCHO": "#ce1126", "CAJAMARCA": "#ce1126", "CUSCO": "#ce1126", "HUANCAVELICA": "#ce1126",
+                    "HUANUCO": "#ce1126", "ICA": "#ff8c00", "JUNIN": "#ce1126", "LA LIBERTAD": "#ff8c00",
+                    "LAMBAYEQUE": "#ff8c00", "LIMA": "#ff8c00", "LORETO": "#ff8c00", "MADRE DE DIOS": "#ce1126",
+                    "MOQUEGUA": "#ce1126", "PASCO": "#ce1126", "PIURA": "#ff8c00", "PUNO": "#ce1126",
+                    "SAN MARTIN": "#ce1126", "TACNA": "#ce1126", "TUMBES": "#ff8c00", "CALLAO": "#ff8c00",
+                    "UCAYALI": "#ff8c00", "EXTRANJERO": "#ff8c00"
+                },
+                top: [
+                    { nombre: "Pedro Castillo", partido: "Perú Libre", pct: "50.1%", color: "#ce1126", foto: true },
+                    { nombre: "Keiko Fujimori", partido: "Fuerza Popular", pct: "49.8%", color: "#ff8c00", foto: true }
+                ]
+            }
         };
 
-        const periodos = ["2011", "2016", "2021"];
+        const periodos = Object.keys(elecciones);
         let currentIndex = 0;
         let geoJsonLayer, callaoInset, pexLayer;
 
-        // --- ESTILO DE LAS REGIONES ---
         function getStyle(name) {
             let n = name ? name.toUpperCase().trim() : "";
             let anio = periodos[currentIndex];
             return {
-                fillColor: elecciones[anio][n] || "#eeeeee",
-                weight: 0.8, // BORDES FINOS
-                opacity: 1, 
-                color: "#444444", // GRIS OSCURO PROFESIONAL
-                fillOpacity: 1
+                fillColor: elecciones[anio].mapa[n] || "#eeeeee",
+                weight: 0.8, opacity: 1, color: "#444444", fillOpacity: 1
             };
         }
 
-        // --- INTERACTIVIDAD ---
-        function onEachFeature(feature, layer) {
-            let nombre = feature.properties.NOMBDEP || "Región";
-            layer.bindPopup("<b>" + nombre + "</b>", { closeButton: false });
-            layer.on('click', function() { this.openPopup(); });
+        function updateTopLegend() {
+            const anio = periodos[currentIndex];
+            const candidatos = elecciones[anio].top;
+            const container = document.getElementById("top-legend");
+            container.innerHTML = "";
+
+            candidatos.forEach(cand => {
+                const card = document.createElement("div");
+                card.className = "candidate-card";
+                
+                // Mostrar círculo solo si tiene 'foto: true'
+                const photoHtml = cand.foto ? `<div class="photo-circle"></div>` : `<div style="width:12px"></div>`;
+                
+                card.innerHTML = `
+                    ${photoHtml}
+                    <div class="candidate-info">
+                        <span class="candidate-name">${cand.nombre}</span>
+                        <span class="party-name">${cand.party || cand.partido}</span>
+                        <div class="percentage-box">
+                            <div class="color-dot" style="background: ${cand.color}"></div>
+                            <span class="percentage">${cand.pct}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
-        // --- CARGA DE DATOS (CON CACHE BUSTER) ---
-        fetch("mapa.geojson?nocache=" + Date.now())
+        fetch("mapa.geojson?v=" + Date.now())
             .then(res => res.json())
             .then(data => {
-                // 1. MAPA BASE PERÚ
                 geoJsonLayer = L.geoJSON(data, {
                     style: f => getStyle(f.properties.NOMBDEP),
-                    onEachFeature: onEachFeature
+                    onEachFeature: (f, l) => { l.bindPopup("<b>" + f.properties.NOMBDEP + "</b>"); }
                 }).addTo(map);
 
-                // 2. ZOOM CALLAO (ESCALA 12)
                 let callaoF = data.features.find(f => f.properties.NOMBDEP === "CALLAO");
                 if (callaoF) {
                     let callaoGeom = JSON.parse(JSON.stringify(callaoF.geometry));
-                    const shift = [-83.5, -9.5], scale = 12, center = [-77.12, -12.05];
-
+                    const shift = [-81.9, -11.5], scale = 12, center = [-77.12, -12.05];
                     function transform(coords) {
                         if (Array.isArray(coords[0])) return coords.map(transform);
                         return [shift[0] + (coords[0] - center[0]) * scale, shift[1] + (coords[1] - center[1]) * scale];
                     }
                     callaoGeom.coordinates = transform(callaoGeom.coordinates);
-
-                    callaoInset = L.geoJSON(callaoGeom, { 
-                        style: getStyle("CALLAO"),
-                        onEachFeature: (f, l) => { l.bindPopup("<b>CALLAO (Zoom)</b>"); }
-                    }).addTo(map);
-                    
-                    // --- LÍNEA DE CONEXIÓN SOLDADA ---
-                    // Punto A (en el zoom): Entra un poco al área del zoom para asegurar unión
-                    // Punto B (en el mapa real): Cae justo en el Callao base
-                    L.polyline([[-10.4, -81.5], [-12.05, -77.12]], {
-                        color: "#444", weight: 1.2, dashArray: "5, 5", opacity: 0.8
-                    }).addTo(map).bringToFront();
+                    callaoInset = L.geoJSON(callaoGeom, { style: getStyle("CALLAO") }).addTo(map);
+                    L.polyline([[-10.4, -81.5], [-12.05, -77.12]], { color: "#444", weight: 1.2, dashArray: "5, 5" }).addTo(map);
                 }
 
-                // 3. RECUADRO PEX (REDONDEADO)
-                pexLayer = L.rectangle([[-15.5, -81.5], [-13.5, -79.5]], getStyle("EXTRANJERO")).addTo(map);
-                pexLayer.bindPopup("<b>PERUANOS EN EL EXTERIOR</b>");
-                let pexEl = pexLayer.getElement();
-                if(pexEl) pexEl.classList.add('pex-rounded');
+                pexLayer = L.rectangle([[-16, -83.5], [-14.5, -79.5]], getStyle("EXTRANJERO")).addTo(map);
+                var pexLabelIcon = L.divIcon({ 
+                    className: 'pex-label', 
+                    html: 'Peruanos en el extranjero', 
+                    iconSize: [160, 20], 
+                    iconAnchor: [80, 10] 
+                });
+                L.marker([-14.1, -81.5], { icon: pexLabelIcon, interactive: false }).addTo(map);
 
-                // --- CICLO DE ANIMACIÓN ---
+                updateTopLegend();
+                document.getElementById("year-display").innerText = periodos[currentIndex];
+
                 setInterval(() => {
                     currentIndex = (currentIndex + 1) % periodos.length;
                     geoJsonLayer.setStyle(f => getStyle(f.properties.NOMBDEP));
                     if (callaoInset) callaoInset.setStyle(getStyle("CALLAO"));
                     if (pexLayer) pexLayer.setStyle(getStyle("EXTRANJERO"));
-                    document.getElementById("year-display").innerText = "1ra Vuelta " + periodos[currentIndex];
-                }, 2000);
-            })
-            .catch(err => console.error("Error al cargar el mapa:", err));
+                    document.getElementById("year-display").innerText = periodos[currentIndex];
+                    updateTopLegend();
+                }, 3000);
+            });
     </script>
 </body>
 </html>
