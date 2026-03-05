@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>ECData - Mapa Electoral</title>
+    <title>ECData - Mapa Electoral Interactivo</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -13,7 +13,8 @@
             background: white; padding: 10px; border: 1px solid #444;
             font-family: Arial, sans-serif; font-weight: bold; font-size: 22px;
         }
-        .pex-rounded { rx: 15; ry: 15; }
+        /* Bordes redondos para el PEX */
+        .pex-rounded { rx: 20; ry: 20; }
         .leaflet-container { background: #fff !important; }
     </style>
 </head>
@@ -41,29 +42,26 @@
             let n = name ? name.toUpperCase().trim() : "";
             return {
                 fillColor: elecciones[periodos[currentIndex]][n] || "#eeeeee",
-                weight: 0.8,
-                opacity: 1, 
-                color: "#444444", 
-                fillOpacity: 1
+                weight: 0.8, opacity: 1, color: "#444444", fillOpacity: 1
             };
         }
 
-        fetch("mapa.geojson")
+        // Cargamos el mapa con un "Cache Buster" (?v=...) para que siempre sea el nuevo
+        fetch("mapa.geojson?v=" + Math.random())
             .then(res => res.json())
             .then(data => {
                 geoJsonLayer = L.geoJSON(data, {
-                    style: function(f) { return getStyle(f.properties.NOMBDEP); },
-                    onEachFeature: function(f, l) {
+                    style: f => getStyle(f.properties.NOMBDEP),
+                    onEachFeature: (f, l) => {
                         l.bindPopup("<b>" + f.properties.NOMBDEP + "</b>");
                         l.on('click', function() { this.openPopup(); });
                     }
                 }).addTo(map);
 
-                // --- CALLAO AJUSTADO ---
+                // --- CALLAO ZOOM (Escala 12) ---
                 let callaoF = data.features.find(f => f.properties.NOMBDEP === "CALLAO");
                 if (callaoF) {
                     let callaoGeom = JSON.parse(JSON.stringify(callaoF.geometry));
-                    // Escala reducida a 12 para que no sea tan invasivo
                     const shift = [-83.5, -9.5], scale = 12, center = [-77.12, -12.05];
 
                     function transform(coords) {
@@ -74,15 +72,16 @@
 
                     callaoInset = L.geoJSON(callaoGeom, { 
                         style: getStyle("CALLAO"),
-                        onEachFeature: function(f, l) { l.bindPopup("<b>CALLAO (Zoom)</b>"); }
+                        onEachFeature: (f, l) => { l.bindPopup("<b>CALLAO (Zoom)</b>"); }
                     }).addTo(map);
                     
-                    // LÍNEA CONECTADA (Inicia en el borde del zoom)
-                    L.polyline([[-10.6, -81.2], [-11.9, -77.2]], {
-                        color: "#444", weight: 1, dashArray: "4, 4", opacity: 0.5
+                    // LÍNEA SOLDADA: Ajuste de coordenadas para unión perfecta
+                    L.polyline([[-10.85, -81.25], [-12.02, -77.15]], {
+                        color: "#444", weight: 1.2, dashArray: "5, 5", opacity: 0.7
                     }).addTo(map);
                 }
 
+                // --- PEX (REDONDEADO) ---
                 pexLayer = L.rectangle([[-15.5, -81.5], [-13.5, -79.5]], getStyle("EXTRANJERO")).addTo(map);
                 pexLayer.bindPopup("<b>PERUANOS EN EL EXTERIOR</b>");
                 let el = pexLayer.getElement();
