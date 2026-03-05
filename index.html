@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>ECData - Mapa Electoral Interactivo</title>
+    <title>ECData - Mapa Electoral</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -13,7 +13,6 @@
             background: white; padding: 10px; border: 1px solid #444;
             font-family: Arial, sans-serif; font-weight: bold; font-size: 22px;
         }
-        /* Bordes redondos para el PEX */
         .pex-rounded { rx: 20; ry: 20; }
         .leaflet-container { background: #fff !important; }
     </style>
@@ -46,8 +45,7 @@
             };
         }
 
-        // Cargamos el mapa con un "Cache Buster" (?v=...) para que siempre sea el nuevo
-        fetch("mapa.geojson?v=" + Math.random())
+        fetch("mapa.geojson?nocache=" + Date.now())
             .then(res => res.json())
             .then(data => {
                 geoJsonLayer = L.geoJSON(data, {
@@ -75,13 +73,12 @@
                         onEachFeature: (f, l) => { l.bindPopup("<b>CALLAO (Zoom)</b>"); }
                     }).addTo(map);
                     
-                    // LÍNEA SOLDADA: Ajuste de coordenadas para unión perfecta
-                    L.polyline([[-10.85, -81.25], [-12.02, -77.15]], {
-                        color: "#444", weight: 1.2, dashArray: "5, 5", opacity: 0.7
-                    }).addTo(map);
+                    // LÍNEA RE-AJUSTADA (Más larga para que entre al zoom)
+                    L.polyline([[-10, -82], [-11.9, -77.2]], {
+                        color: "#444", weight: 1.5, dashArray: "5, 5", opacity: 0.8
+                    }).addTo(map).bringToFront();
                 }
 
-                // --- PEX (REDONDEADO) ---
                 pexLayer = L.rectangle([[-15.5, -81.5], [-13.5, -79.5]], getStyle("EXTRANJERO")).addTo(map);
                 pexLayer.bindPopup("<b>PERUANOS EN EL EXTERIOR</b>");
                 let el = pexLayer.getElement();
