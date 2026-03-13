@@ -1,17 +1,99 @@
 /* =========================================
-   1. RESET Y ESTRUCTURA BASE
+   1. RESET (LIBERACIÓN DE SCROLL)
    ========================================= */
 body, html {
-    margin: 0; padding: 0; height: 100%; overflow: hidden;
-    background-color: #ffffff; font-family: 'Arial', sans-serif;
-}
-
-#map {
-    width: 100%; height: 100vh; background-color: #ffffff !important;
+    margin: 0; padding: 0; 
+    background-color: #ffffff; 
+    font-family: 'Arial', sans-serif;
 }
 
 /* =========================================
-   2. CONTROLES Y ETIQUETAS (UI)
+   2. HEADER DEL ESPECIAL
+   ========================================= */
+.special-header {
+    max-width: 800px;
+    margin: 60px auto 40px auto;
+    padding: 0 20px;
+    text-align: center;
+}
+.kicker {
+    margin-bottom: 20px; 
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}
+.kicker img {
+    height: 35px; 
+    width: auto; 
+    display: block; 
+    max-width: 100%; 
+}
+.headline {
+    font-family: 'Georgia', serif; 
+    font-size: 42px;
+    font-weight: bold;
+    color: #111;
+    line-height: 1.15;
+    margin-bottom: 20px;
+}
+.intro-text {
+    font-size: 18px;
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+.date-published {
+    font-size: 13px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* =========================================
+   3. TEXTO EDITORIAL
+   ========================================= */
+.story-text {
+    max-width: 700px; 
+    margin: 0 auto;
+    padding: 0 20px;
+}
+.story-text p {
+    font-family: 'Arial', sans-serif; 
+    font-size: 18px;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 20px;
+}
+.story-text h2 {
+    font-family: 'Georgia', serif;
+    font-size: 26px;
+    font-weight: bold;
+    color: #111;
+    margin-top: 50px;
+    margin-bottom: 20px;
+}
+
+/* =========================================
+   4. CONTENEDOR DEL INTERACTIVO
+   ========================================= */
+.viz-container {
+    position: relative;
+    width: 100%;
+    height: 85vh; 
+    min-height: 950px; 
+    background-color: #fcfcfc;
+    border-top: 1px solid #eaeaea;
+    border-bottom: 1px solid #eaeaea;
+    overflow: hidden; 
+    margin: 60px 0; 
+}
+
+#map {
+    width: 100%; height: 100%; background-color: transparent !important;
+}
+
+/* =========================================
+   5. CONTROLES Y UI DEL MAPA (BOTONERA FLAT)
    ========================================= */
 .ui-element {
     position: absolute; z-index: 3000; background: white;
@@ -20,13 +102,54 @@ body, html {
     box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
 }
 
-#play-pause-btn {
-    top: 20px; left: 20px; padding: 10px 15px;
-    font-size: 14px; cursor: pointer; transition: background-color 0.2s;
+.controls-container {
+    top: 20px; left: 20px;
+    display: flex;
+    padding: 0; 
+    border: 1.5px solid #ccc !important; 
+    border-radius: 4px; 
+    overflow: hidden; 
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1) !important;
 }
 
-#play-pause-btn:hover { background-color: #f0f0f0; }
-#play-pause-btn:active { box-shadow: 1px 1px 0px rgba(0,0,0,0.1); transform: translate(2px, 2px); }
+.control-btn {
+    background: white;
+    border: none;
+    border-right: 1px solid #ccc; 
+    padding: 8px 12px; 
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s, color 0.2s;
+    color: #000;
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}
+.control-btn:last-child {
+    border-right: none; 
+}
+
+.control-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background-color: #fafafa;
+}
+
+.control-btn.main-btn {
+    font-weight: 900;
+    width: 45px; 
+    font-size: 16px; 
+    background-color: #333; 
+    color: #fff; 
+}
+
+.control-btn:hover:not(:disabled) { 
+    background-color: #f0f0f0; 
+}
+.control-btn.main-btn:hover:not(:disabled) { 
+    background-color: #111; 
+    color: #fff;
+}
 
 .year-label {
     top: 20px; left: 50%; transform: translateX(-50%);
@@ -34,7 +157,7 @@ body, html {
 }
 
 /* =========================================
-   3. TARJETAS DE CANDIDATOS (Jerarquía CSS)
+   6. TARJETAS DE CANDIDATOS
    ========================================= */
 .cand-info-container { display: flex; flex-direction: column; }
 .cand-name { font-weight: 900; color: #000; text-transform: uppercase; line-height: 1; }
@@ -42,7 +165,6 @@ body, html {
 .cand-pct { font-weight: 900; display: flex; align-items: center; color: #000; }
 .dot { border-radius: 3px; }
 
-/* -- Variantes: Candidatos Principales -- */
 .candidate-big {
     position: absolute; z-index: 2500; top: 50%; transform: translateY(-50%);
     width: 250px; text-align: center; align-items: center; display: flex; flex-direction: column;
@@ -52,28 +174,37 @@ body, html {
 
 .candidate-big .photo {
     width: 170px; height: 170px; border-radius: 50%;
-    background-color: #d1d1d1; box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    background-color: transparent; /* Quitamos el fondo gris */
+    border: 1.5px solid #d1d1d1; /* Añadimos el borde sutil */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
     margin-bottom: 12px;
 }
+
 .candidate-big .cand-info-container { align-items: center; text-align: center; }
 .candidate-big .cand-name { font-size: 24px; margin-bottom: 4px; }
 .candidate-big .cand-party { font-size: 12px; margin-bottom: 8px; }
 .candidate-big .cand-pct { font-size: 32px; justify-content: center; }
 .candidate-big .dot { width: 16px; height: 16px; margin: 0 12px; }
 
-/* -- Variantes: Candidatos Secundarios -- */
 .bottom-legend-container {
-    position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
+    position: absolute; 
+    bottom: 50px; 
+    left: 50%; transform: translateX(-50%);
     z-index: 2500; display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;
 }
 .candidate-small {
     display: flex; align-items: center; background: rgba(255,255,255,0.8);
     padding: 5px 10px; border-radius: 4px; text-align: left;
 }
+/* Para los candidatos secundarios (3er y 4to puesto abajo) */
 .candidate-small .photo {
-    width: 50px; height: 50px; border-radius: 50%; background-color: #e0e0e0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-right: 10px;
+    width: 50px; height: 50px; border-radius: 50%; 
+    background-color: transparent; /* Quitamos el fondo gris */
+    border: 1px solid #d1d1d1; /* Añadimos el borde sutil */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+    margin-right: 10px;
 }
+
 .candidate-small .cand-info-container { align-items: flex-start; text-align: left; }
 .candidate-small .cand-name { font-size: 16px; margin-bottom: 2px;}
 .candidate-small .cand-party { font-size: 9px; margin-bottom: 4px;}
@@ -81,21 +212,18 @@ body, html {
 .candidate-small .dot { width: 12px; height: 12px; margin-right: 8px; }
 
 /* =========================================
-   4. MAPA, POPUPS Y EXTRANJERO
+   7. MAPA, POPUPS Y EXTRANJERO
    ========================================= */
-.leaflet-container { background: #fff !important; }
+.leaflet-container { background: #fcfcfc !important; }
 
-/* El Mundo (PEX) - Restaurado para colorear el océano */
 .pex-globe-container { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
 .pex-globe {
     width: 60px; height: 60px; border-radius: 50%;
     background-image: url('fotos/mundo.png'); 
-    background-size: 115%; /* Llenará el círculo sin dejar bordes blancos */
-    background-position: center; background-repeat: no-repeat;
-    background-color: transparent; /* El JS inyectará el color aquí, o lo dejará transparente */
-    border: 2px solid #444; 
+    background-size: 115%; background-position: center; background-repeat: no-repeat;
+    background-color: transparent; border: 2px solid #444; 
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    transition: background-color 0.3s, transform 0.2s; margin-bottom: 5px;
+    margin-bottom: 5px;
 }
 .pex-globe-container:hover .pex-globe { transform: scale(1.08); }
 .pex-label { 
@@ -104,21 +232,125 @@ body, html {
     text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
 }
 
-/* Popups Leaflet */
 .leaflet-popup-content-wrapper { border-radius: 0px; border: 1px solid #000; padding: 2px; }
 .popup-region { font-weight: 900; text-transform: uppercase; font-size: 14px; border-bottom: 1px solid #eee; margin-bottom: 5px; padding-bottom: 3px; display: block; }
+
+/* ESTILO PARA EL GANADOR LOCAL DESTACADO */
+.popup-local-winner { 
+    font-weight: 900; 
+    font-size: 13px; 
+    color: #111;
+    background-color: #f0f0f0;
+    padding: 3px 5px; 
+    margin-bottom: 3px; 
+    border-radius: 3px;
+    display: inline-block;
+}
+
+/* ESTILO PARA NOTAS HISTÓRICAS (Regiones no creadas) */
+.popup-historical-note {
+    font-size: 12px;
+    color: #555;
+    font-style: italic; 
+    line-height: 1.3;
+    padding-top: 5px;
+    max-width: 180px; 
+}
+
 .popup-party { font-size: 10px; color: #666; display: block; margin-bottom: 2px; }
 .popup-pct { font-size: 18px; font-weight: 900; display: flex; align-items: baseline; gap: 4px; }
 .popup-pct-label { font-size: 10px; font-weight: 400; color: #444; }
 
 /* =========================================
-   5. RESPONSIVO (MÓVILES)
+   8. SECCIÓN DE CRÉDITOS (FOOTER)
+   ========================================= */
+.special-credits {
+    max-width: 800px;
+    margin: 60px auto 80px auto;
+    padding: 30px 20px 0 20px;
+    border-top: 2px solid #000;
+    text-align: left;
+}
+.special-credits h3 {
+    font-family: 'Georgia', serif;
+    font-size: 20px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.credit-item {
+    font-size: 15px;
+    color: #444;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+.credit-item strong {
+    color: #000;
+}
+
+/* =========================================
+   9. RESPONSIVO (MÓVILES)
    ========================================= */
 @media (max-width: 768px) {
+    .headline { font-size: 32px; }
+    .story-text { padding: 0 15px; }
+    .viz-container { height: 85vh; min-height: 800px; margin: 40px 0;}
     .candidate-big { width: 120px; top: auto; bottom: 120px; transform: translateY(0); }
     .candidate-big .photo { width: 100px; height: 100px; }
     .candidate-big .cand-name { font-size: 14px; }
     .candidate-big .cand-pct { font-size: 20px; }
-    .bottom-legend-container { gap: 10px; bottom: 10px; }
+    .bottom-legend-container { gap: 10px; bottom: 30px; }
     .candidate-small .photo { width: 35px; height: 35px; }
+}
+
+/* =========================================
+   10. ANIMACIONES DEL MAPA (OPTIMIZADO)
+   ========================================= */
+path.leaflet-interactive {
+    transition: fill 0.8s ease-in-out, stroke 0.8s ease-in-out !important;
+}
+.pex-globe {
+    transition: background-color 0.8s ease-in-out, transform 0.2s !important;
+}
+
+/* =========================================
+   11. NOTAS DE CONTEXTO DINÁMICAS
+   ========================================= */
+.year-context-note {
+    position: absolute;
+    top: 80px; /* MAGIA: Lo empujamos hacia arriba, justo debajo del año de la elección */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3500; 
+    background-color: rgba(255, 255, 255, 0.95);
+    border-left: 4px solid #111;
+    padding: 12px 20px;
+    width: 90%;
+    max-width: 600px;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    border-radius: 4px;
+    text-align: left;
+    display: none; 
+}
+
+.year-context-note strong {
+    color: #000;
+    font-weight: 900;
+    display: block;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+    .year-context-note {
+        top: 70px; /* En celulares lo pegamos un poquito más al año */
+        font-size: 13px;
+        padding: 10px 15px;
+    }
 }
