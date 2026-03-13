@@ -74,7 +74,7 @@ body, html {
 }
 
 /* =========================================
-   4. CONTENEDOR DEL INTERACTIVO
+   4. CONTENEDOR DEL INTERACTIVO (FASE 1)
    ========================================= */
 .viz-container {
     position: relative;
@@ -87,13 +87,12 @@ body, html {
     overflow: hidden; 
     margin: 60px 0; 
 }
-
 #map {
     width: 100%; height: 100%; background-color: transparent !important;
 }
 
 /* =========================================
-   5. CONTROLES Y UI DEL MAPA (BOTONERA FLAT)
+   5. CONTROLES Y UI DEL MAPA
    ========================================= */
 .ui-element {
     position: absolute; z-index: 3000; background: white;
@@ -101,7 +100,6 @@ body, html {
     font-weight: 900; text-transform: uppercase;
     box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
 }
-
 .controls-container {
     top: 20px; left: 20px;
     display: flex;
@@ -111,7 +109,6 @@ body, html {
     overflow: hidden; 
     box-shadow: 2px 2px 5px rgba(0,0,0,0.1) !important;
 }
-
 .control-btn {
     background: white;
     border: none;
@@ -128,13 +125,11 @@ body, html {
 .control-btn:last-child {
     border-right: none; 
 }
-
 .control-btn:disabled {
     opacity: 0.3;
     cursor: not-allowed;
     background-color: #fafafa;
 }
-
 .control-btn.main-btn {
     font-weight: 900;
     width: 45px; 
@@ -142,7 +137,6 @@ body, html {
     background-color: #333; 
     color: #fff; 
 }
-
 .control-btn:hover:not(:disabled) { 
     background-color: #f0f0f0; 
 }
@@ -150,7 +144,6 @@ body, html {
     background-color: #111; 
     color: #fff;
 }
-
 .year-label {
     top: 20px; left: 50%; transform: translateX(-50%);
     padding: 10px 20px; font-size: 18px;
@@ -164,28 +157,24 @@ body, html {
 .cand-party { color: #666; text-transform: uppercase; font-weight: 400; letter-spacing: 1.5px; }
 .cand-pct { font-weight: 900; display: flex; align-items: center; color: #000; }
 .dot { border-radius: 3px; }
-
 .candidate-big {
     position: absolute; z-index: 2500; top: 50%; transform: translateY(-50%);
     width: 250px; text-align: center; align-items: center; display: flex; flex-direction: column;
 }
 .pos-left { left: 8%; }
 .pos-right { right: 8%; }
-
 .candidate-big .photo {
     width: 170px; height: 170px; border-radius: 50%;
-    background-color: transparent; /* Quitamos el fondo gris */
-    border: 1.5px solid #d1d1d1; /* Añadimos el borde sutil */
+    background-color: transparent; 
+    border: 1.5px solid #d1d1d1; 
     box-shadow: 0 6px 12px rgba(0,0,0,0.1);
     margin-bottom: 12px;
 }
-
 .candidate-big .cand-info-container { align-items: center; text-align: center; }
 .candidate-big .cand-name { font-size: 24px; margin-bottom: 4px; }
 .candidate-big .cand-party { font-size: 12px; margin-bottom: 8px; }
 .candidate-big .cand-pct { font-size: 32px; justify-content: center; }
 .candidate-big .dot { width: 16px; height: 16px; margin: 0 12px; }
-
 .bottom-legend-container {
     position: absolute; 
     bottom: 50px; 
@@ -196,15 +185,13 @@ body, html {
     display: flex; align-items: center; background: rgba(255,255,255,0.8);
     padding: 5px 10px; border-radius: 4px; text-align: left;
 }
-/* Para los candidatos secundarios (3er y 4to puesto abajo) */
 .candidate-small .photo {
     width: 50px; height: 50px; border-radius: 50%; 
-    background-color: transparent; /* Quitamos el fondo gris */
-    border: 1px solid #d1d1d1; /* Añadimos el borde sutil */
+    background-color: transparent; 
+    border: 1px solid #d1d1d1; 
     box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
     margin-right: 10px;
 }
-
 .candidate-small .cand-info-container { align-items: flex-start; text-align: left; }
 .candidate-small .cand-name { font-size: 16px; margin-bottom: 2px;}
 .candidate-small .cand-party { font-size: 9px; margin-bottom: 4px;}
@@ -215,27 +202,38 @@ body, html {
    7. MAPA, POPUPS Y EXTRANJERO
    ========================================= */
 .leaflet-container { background: #fcfcfc !important; }
+.pex-globe-container { 
+    display: flex; flex-direction: column; align-items: center; cursor: pointer; 
+}
 
-.pex-globe-container { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
 .pex-globe {
-    width: 60px; height: 60px; border-radius: 50%;
+    width: 60px; /* Volvemos al tamaño original un poco más grande */
+    height: 60px;
+    border-radius: 50%;
+    /* Restauramos la imagen del mundo */
     background-image: url('fotos/mundo.png'); 
-    background-size: 115%; background-position: center; background-repeat: no-repeat;
-    background-color: transparent; border: 2px solid #444; 
+    background-size: 115%; 
+    background-position: center; 
+    background-repeat: no-repeat;
+    /* Mantenemos el borde oscuro y la transición de color */
+    background-color: #eeeeee; 
+    border: 2px solid #444; 
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     margin-bottom: 5px;
+    transition: background-color 0.4s ease-in-out !important;
 }
-.pex-globe-container:hover .pex-globe { transform: scale(1.08); }
+
+.pex-globe-container:hover .pex-globe {
+    transform: scale(1.08);
+}
+
 .pex-label { 
     font-weight: 900; font-size: 11px; color: #333; text-transform: uppercase; 
     text-align: center; letter-spacing: 1px; pointer-events: none;
     text-shadow: 1px 1px 0px rgba(255,255,255,0.8);
 }
-
 .leaflet-popup-content-wrapper { border-radius: 0px; border: 1px solid #000; padding: 2px; }
 .popup-region { font-weight: 900; text-transform: uppercase; font-size: 14px; border-bottom: 1px solid #eee; margin-bottom: 5px; padding-bottom: 3px; display: block; }
-
-/* ESTILO PARA EL GANADOR LOCAL DESTACADO */
 .popup-local-winner { 
     font-weight: 900; 
     font-size: 13px; 
@@ -246,17 +244,10 @@ body, html {
     border-radius: 3px;
     display: inline-block;
 }
-
-/* ESTILO PARA NOTAS HISTÓRICAS (Regiones no creadas) */
 .popup-historical-note {
-    font-size: 12px;
-    color: #555;
-    font-style: italic; 
-    line-height: 1.3;
-    padding-top: 5px;
-    max-width: 180px; 
+    font-size: 12px; color: #555; font-style: italic; 
+    line-height: 1.3; padding-top: 5px; max-width: 180px; 
 }
-
 .popup-party { font-size: 10px; color: #666; display: block; margin-bottom: 2px; }
 .popup-pct { font-size: 18px; font-weight: 900; display: flex; align-items: baseline; gap: 4px; }
 .popup-pct-label { font-size: 10px; font-weight: 400; color: #444; }
@@ -265,31 +256,18 @@ body, html {
    8. SECCIÓN DE CRÉDITOS (FOOTER)
    ========================================= */
 .special-credits {
-    max-width: 800px;
-    margin: 60px auto 80px auto;
-    padding: 30px 20px 0 20px;
-    border-top: 2px solid #000;
-    text-align: left;
+    max-width: 800px; margin: 60px auto 80px auto;
+    padding: 30px 20px 0 20px; border-top: 2px solid #000; text-align: left;
 }
 .special-credits h3 {
-    font-family: 'Georgia', serif;
-    font-size: 20px;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-family: 'Georgia', serif; font-size: 20px;
+    margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;
 }
-.credit-item {
-    font-size: 15px;
-    color: #444;
-    margin-bottom: 10px;
-    line-height: 1.5;
-}
-.credit-item strong {
-    color: #000;
-}
+.credit-item { font-size: 15px; color: #444; margin-bottom: 10px; line-height: 1.5; }
+.credit-item strong { color: #000; }
 
 /* =========================================
-   9. RESPONSIVO (MÓVILES)
+   9. RESPONSIVO BÁSICO
    ========================================= */
 @media (max-width: 768px) {
     .headline { font-size: 32px; }
@@ -304,7 +282,7 @@ body, html {
 }
 
 /* =========================================
-   10. ANIMACIONES DEL MAPA (OPTIMIZADO)
+   10. ANIMACIONES DEL MAPA
    ========================================= */
 path.leaflet-interactive {
     transition: fill 0.8s ease-in-out, stroke 0.8s ease-in-out !important;
@@ -317,40 +295,150 @@ path.leaflet-interactive {
    11. NOTAS DE CONTEXTO DINÁMICAS
    ========================================= */
 .year-context-note {
-    position: absolute;
-    top: 80px; /* MAGIA: Lo empujamos hacia arriba, justo debajo del año de la elección */
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 3500; 
-    background-color: rgba(255, 255, 255, 0.95);
-    border-left: 4px solid #111;
-    padding: 12px 20px;
-    width: 90%;
-    max-width: 600px;
-    font-family: 'Arial', sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #333;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    border-radius: 4px;
-    text-align: left;
-    display: none; 
+    position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
+    z-index: 3500; background-color: rgba(255, 255, 255, 0.95);
+    border-left: 4px solid #111; padding: 12px 20px;
+    width: 90%; max-width: 600px; font-family: 'Arial', sans-serif;
+    font-size: 14px; line-height: 1.5; color: #333;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15); border-radius: 4px;
+    text-align: left; display: none; 
 }
-
 .year-context-note strong {
-    color: #000;
-    font-weight: 900;
-    display: block;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    font-size: 11px;
-    letter-spacing: 1px;
+    color: #000; font-weight: 900; display: block;
+    margin-bottom: 4px; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;
+}
+@media (max-width: 768px) {
+    .year-context-note { top: 70px; font-size: 13px; padding: 10px 15px; }
 }
 
-@media (max-width: 768px) {
-    .year-context-note {
-        top: 70px; /* En celulares lo pegamos un poquito más al año */
-        font-size: 13px;
-        padding: 10px 15px;
+/* =========================================
+   12. COMBO VISUAL: MAPA + LEYENDA + GRÁFICO (FASE 2)
+   ========================================= */
+.combo-visual-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 40px auto;
+    gap: 30px;
+    padding: 0 20px;
+    align-items: center; 
+    justify-content: center;
+}
+.columna-mitad {
+    flex: 1;
+    min-width: 320px; 
+    display: flex;
+    flex-direction: column;
+}
+.anio-titulo {
+    font-family: 'Georgia', serif;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.mapa-impacto-box {
+    width: 100%;
+    height: 450px; 
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    border: 1px solid #eaeaea;
+    z-index: 1; 
+}
+.grafico-wrapper {
+    width: 100%;
+    height: 400px; 
+    background-color: #fff;
+}
+.columna-leyenda {
+    flex: 0 0 160px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+}
+.leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-family: 'Arial', sans-serif;
+    font-size: 13px;
+    font-weight: 900;
+    color: #333;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+    padding: 6px;
+    border-radius: 6px;
+}
+.leyenda-item:hover { background-color: #f0f0f0; }
+.leyenda-color {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+@media (max-width: 850px) {
+    .combo-visual-container { flex-direction: column; }
+    .columna-leyenda {
+        flex-direction: row; flex-wrap: wrap; width: 100%;
+        justify-content: center; margin: 20px 0;
     }
+    .leyenda-item { flex: 0 0 auto; }
+}
+
+/* =========================================
+   13. FASE 3: PARTICIPACIÓN (SLIDER Y MAPA DE CALOR)
+   ========================================= */
+.participacion-wrapper {
+    max-width: 1200px;
+    margin: 0 auto 60px auto;
+}
+.slider-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+}
+.fase3-title {
+    font-family: 'Georgia', serif;
+    font-size: 28px;
+    font-weight: bold;
+    color: #111;
+    display: inline-block;
+    margin-bottom: 15px;
+    background-color: #f0f0f0;
+    padding: 5px 15px;
+    border-radius: 4px;
+}
+.custom-slider {
+    -webkit-appearance: none;
+    appearance: none; /* <-- Agrega esta línea para que el editor sea feliz */
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: #d1d1d1;
+    outline: none;
+    margin-bottom: 20px;
+}
+.custom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #007f8b; /* Turquesa ECData */
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.1s;
+}
+.custom-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+#mapa-fase3 {
+    width: 100%;
+    height: 500px;
+    background-color: #fcfcfc !important;
+    border-radius: 8px;
+    border: 1px solid #eaeaea;
 }
