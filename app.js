@@ -12,8 +12,8 @@ const map = L.map('map', {
     zoomControl: false, dragging: false, scrollWheelZoom: false,
     doubleClickZoom: false, touchZoom: false, attributionControl: false, zoomSnap: 0 
 }).setView(
-    esMovil ? [-8.8, -75.0] : [-8.0, -76.5], // Coordenadas (Móvil vs Desktop)
-    esMovil ? 4.1 : 5.55                     // Zoom (Móvil vs Desktop)
+    esMovil ? [-12.0, -75.0] : [-8.0, -76.5], // Coordenadas (Móvil vs Desktop)
+    esMovil ? 4.4 : 5.55                     // Zoom (Móvil vs Desktop)
 );
 
 let elecciones = {}, periodos = [], currentIndex = 0;
@@ -319,7 +319,7 @@ const staticOptionsImpacto = {
 // ¡Actualizado con zoom condicional para móviles!
 const mapaImpacto = L.map('mapa-impacto', staticOptionsImpacto).setView(
     esMovil ? [-9.0, -75.0] : [-9.5, -74.5], // Coordenadas (Móvil vs Desktop)
-    esMovil ? 4.4 : 5.4                      // Zoom (Móvil vs Desktop)
+    esMovil ? 5.0 : 5.4                      // Zoom (Móvil vs Desktop)
 );
 let capaCartograma;
 
