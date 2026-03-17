@@ -3,30 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECData - Especial Electoral</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>Así vota el Perú - ECData</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
     <header class="special-header">
         <div class="kicker">
-            <img src="fotos/logo_ecdata.png" alt="Logo ECData">
+            <img src="fotos/logo_ecdata.png" alt="Logo ECData" onerror="this.style.display='none'">
         </div>
-        <h1 class="headline">Así votó el Perú: el mapa electoral de los últimos 41 años</h1>
-        <p class="intro-text">Un recorrido visual por los resultados electorales desde 1980 hasta la actualidad. Observa cómo cambió la preferencia política, región por región, y el impacto del voto de los peruanos en el extranjero a lo largo de las décadas.</p>
-        <div class="date-published">Marzo 2026</div>
+        
+        <h1 class="headline">Así vota el Perú</h1>
+        <h2 class="subheadline">¿Cómo ha evolucionado el mapa electoral en casi medio siglo?</h2>
+        
+        <p class="intro-text">Siete de las 10 últimas elecciones presidenciales se definieron en segunda vuelta. Desde el 2006, ningún candidato que ganó la primera vuelta en Lima llegó a ocupar el sillón presidencial.</p>
+        
+        <div class="header-divider"></div>
+        <div class="date-published">16 de marzo de 2026</div>
+        
+        <div class="social-share-container">
+            <a href="#" class="social-btn" title="Compartir en Facebook">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z"/></svg>
+            </a>
+            <a href="#" class="social-btn" title="Compartir en X (Twitter)">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="#" class="social-btn" title="Compartir en WhatsApp">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+            </a>
+        </div>
     </header>
 
-    <div class="story-text">
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-        
-        <h2>El inicio de la fragmentación</h2>
-        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida.</p>
-    </div>
+    <article class="story-text">
+        <p>¿Quién ganará las elecciones generales del 2026? A menos de un mes de la primera vuelta, los resultados parecieran impredecibles. El proceso electoral del próximo domingo 12 de abril será el más complejo de la historia reciente del Perú. Por primera vez, los peruanos tendrán que elegir entre 35 candidatos a la presidencia –casi el doble que en los comicios del 2021– y hasta ahora las encuestas coinciden, de forma unánime, en un punto: la fragmentación del voto.</p>
+        <p>Hasta mediados de marzo, ningún postulante a la presidencia ha superado el 12% de intención de voto. Es decir, el postulante que encabeza los sondeos tiene el respaldo de poco más de uno de cada 10 ciudadanos, según el más reciente estudio de Datum.</p>
+        <p>Pero a pesar de lo complejo de este proceso electoral, tiene más similitudes que diferencias con elecciones anteriores. En los últimos 45 años, en el país hubo un patrón claro: la mayoría de veces, el presidente del Perú se definió en la segunda vuelta.</p>
+        <p>Así, siete de las últimas 10 elecciones se decidieron en el balotaje. La última vez que un candidato superó el 50% de los votos válidos –requisito para ganar en primera vuelta– fue en 1995. Ese año, Alberto Fujimori, quien tentaba su primera reelección con Cambio 90–Nueva Mayoría, tuvo una arrasadora victoria, al punto de que ganó en todas las plazas electorales.</p>
+        <p>Desde el 2000, el balotaje es el mecanismo más común en las elecciones presidenciales en el país. Antes, se utilizó en los comicios de 1990, que enfrentó a Fujimori, de Cambio 90, con Mario Vargas Llosa, del Frente Democrático (Fredemo).</p>
+        <p>Sin embargo, una victoria en primera vuelta, por aplastante que sea, no ha garantizado el triunfo en el balotaje. En tres de las siete segundas vueltas desde 1980, el candidato más votado en la primera elección no ganó en la segunda.</p>
+        <p>En 1990, por ejemplo, Mario Vargas Llosa fue el candidato preferido, con 33% de los votos válidos. Sin embargo, en el balotaje, Alberto Fujimori pasó de haber ganado en ocho circunscripciones en la primera vuelta a imponerse en 24 en la segunda, ganando así la elección.</p>
+        <p>En el 2006, Ollanta Humala fue el más votado en primera vuelta. En la segunda, Alan García amplió su ventaja de 5 a 11 distritos electorales y resultó ganador. Algo similar ocurrió en el 2016, cuando Pedro Pablo Kuczynski pasó de ganar solo en Arequipa en la primera vuelta a imponerse en 13 circunscripciones en el balotaje.</p>
+        <p>Hay un detalle interesante y peculiar: solo en dos de las siete segundas vueltas, el ganador se impuso a pesar de tener un voto desfavorable en Lima (Metropolitana y Lima Provincias). Esto ocurrió en el 2011 con Ollanta Humala, de Gana Perú, y en el 2021 con Pedro Castillo, de Perú Libre.</p>
+    </article>
 
     <div class="viz-container">
         <div class="controls-container ui-element">
@@ -41,73 +65,106 @@
         <div id="cand-1" class="candidate-big pos-left"></div>
         <div id="cand-2" class="candidate-big pos-right"></div>
         <div id="bottom-candidates" class="bottom-legend-container"></div>
+        
+        <div class="source-note source-fase1"><strong>Fuente:</strong> INFOGOB, JNE</div>
         <div id="map"></div>
     </div>
 
-    <div class="story-text">
-        <h2>El voto en el extranjero</h2>
-        <p>Phasellus volutpat, metus eget egestas mollis, lacus lacus blandit dui, id egestas quam mauris ut lacus. Suspendisse pulvinar, augue ac venenatis condimentum, sem libero volutpat nibh, nec pellentesque velit pede quis nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Fusce id purus.</p>
-        
-        <p>Proin viverra, ligula sit amet ultrices semper, ligula arcu tristique sapien, a accumsan nisi mauris ac eros. In hac habitasse platea dictumst. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
-    </div>
-
-    <div class="story-text" style="margin-top: 60px;">
-        <h2>El estallido del padrón y la concentración del voto</h2>
-        <p>En las últimas cuatro décadas, el electorado peruano se cuadruplicó. Mientras que el peso relativo de las regiones tuvo ligeras variaciones, en números absolutos la concentración en la capital alcanzó niveles históricos. En el siguiente mapa, el tamaño de cada región refleja su cantidad real de votantes en 2021.</p>
-    </div>
+    <article class="story-text">
+        <h2>Un país dividido</h2>
+        <p>Más allá de los resultados finales, los mapas electorales muestran que el voto ha tendido a organizarse en bloques claramente definidos.</p>
+        <p>Desde el 2006, las regiones del sur (Arequipa, Moquegua, Tacna, Puno y Cusco) votaron en bloque por un candidato distinto al que eligió la capital. Por ejemplo, en las primeras vueltas del 2006 y del 2011, las cinco regiones mencionadas votaron mayoritariamente por Humala. En el 2016, respaldaron a Kuczynski y a Verónika Mendoza, del Frente Amplio; y, en el 2021, se inclinaron por Pedro Castillo.</p>
+        <p>En las segundas vueltas de los años electorales estudiados, el patrón se mantuvo: el sur reforzó e incrementó su apoyo a los mismos candidatos, pero con una excepción: en el 2016, Verónika Mendoza no pasó a la segunda vuelta. El voto de Cusco, Puno, Moquegua y Tacna migró a Kuczynski, quien se impuso por una cantidad mínima de votos sobre Keiko Fujimori. En primera vuelta, la candidata de Fuerza Popular había obtenido casi el doble de votos válidos que PPK.</p>
+        <p>A mediados de marzo, los candidatos que lideran -en empate técnico- la intención de voto en el sur son los izquierdistas Yonhy Lescano (9,8%) y Alfonso López Chau (9,1%). Muy cerca -de hecho, también en empate técnico por estar dentro del margen de error- se ubica Rafael López Aliaga (8,4%).</p>
+        <p>El norte, por su parte, se configuró como otro bloque electoral. Tumbes, Piura, Lambayeque y La Libertad tendieron a votar de forma similar y en sentido opuesto al sur. En el 2006, Alan García se impuso en esta zona.</p>
+        <p>Desde el 2011, los departamentos norteños han endosado, en gran medida, a Keiko Fujimori. Tal como sucedió en el sur, reafirmaron su apoyo a los mismos candidatos en varios balotajes. Según la última medición de intención de voto de Datum, la candidata fujimorista continúa liderando la zona norte.</p>
+        <p>Lima es la circunscripción electoral más importante en cantidad de electores. Sin embargo, desde el 2006 ningún candidato que ganó en primera vuelta en la capital llegó a Palacio de Gobierno.</p>
+        <p>Pese a ser los más votados en la capital en primera vuelta, Lourdes Flores (Unidad Nacional, 2006), Pedro Pablo Kuczynski (Alianza por el Gran Kambio, 2011) y Hernando de Soto (Avanza País, 2021), ni siquiera lograron pasar a segunda vuelta.</p>
+        <p>Del mismo modo, si bien en el 2016 Keiko Fujimori se alzó con el triunfo en la capital, fue derrotada por Pedro Castillo en el balotaje.</p>
+    </article>
 
     <div class="combo-visual-container">
         <div class="columna-mitad">
-            <h3 class="anio-titulo">El peso real hoy (2021)</h3>
+            <div class="anio-titulo">El peso real hoy (2021)</div>
             <div id="mapa-impacto" class="mapa-impacto-box"></div>
         </div>
         
         <div class="columna-leyenda" id="leyenda-compartida">
             </div>
-        
+
         <div class="columna-mitad">
-            <h3 class="anio-titulo">Electores absolutos (1980 - 2021)</h3>
+            <div class="anio-titulo">Electores absolutos (1980 - 2021)</div>
             <div class="grafico-wrapper">
                 <canvas id="grafico-areas"></canvas>
             </div>
         </div>
     </div>
+    <div class="source-note"><strong>Fuente:</strong> INFOGOB, JNE</div>
 
-    <div class="story-text" style="margin-top: 80px;">
-        <h2>El ausentismo y la participación ciudadana</h2>
-        <p>Desliza la línea de tiempo para observar cómo ha variado el nivel de participación electoral en cada región. Las zonas con colores más oscuros representan una mayor asistencia a las urnas.</p>
-    </div>
+    <article class="story-text">
+        <h2>Menos interés</h2>
+        <p>El ausentismo es otro fenómeno electoral que ha aumentado en los últimos años. Entre 1980 y el 2021, el promedio nacional de peruanos que acudieron a votar alcanzó el 81% de los electores hábiles.</p>
+        <p>Los picos más altos se registraron en 1985 y el 2006 (primera vuelta), con 91% y 89%, respectivamente.</p>
+        <p>Pero, precisamente desde el 2006, la participación de los electores ha disminuido de forma constante. El mínimo se registró en la primera vuelta del 2021, con 71% en la primera vuelta. En ese entonces, el mundo aún enfrentaba una emergencia sanitaria por el COVID–19.</p>
+        <p>En la segunda vuelta del 2021, la asistencia repuntó levemente a 75%. Aun así, se trata de la tercera elección con más ausentismo en los últimos 45 años.</p>
+        <p>Las diferencias entre zonas también se han visto reflejadas en la participación electoral. Huánuco es la circunscripción electoral que más ha figurado entre los 10 departamentos con mayor ausentismo: en 16 de 17 de las últimas primeras y segundas vueltas.</p>
+        <p>Le siguen en la lista Amazonas, Apurímac, Ayacucho y los peruanos en el exterior, Loreto y Huancavelica.</p>
+    </article>
 
     <div class="participacion-wrapper">
         <div class="slider-container">
-            <div class="slider-header">
-                <span id="fase3-year-display" class="fase3-title">Cargando...</span>
-            </div>
-            <input type="range" id="slider-fase3" min="0" max="16" value="16" class="custom-slider">
+            <div class="fase3-title" id="fase3-year-display">Cargando...</div>
+            <input type="range" id="slider-fase3" class="custom-slider" min="0" max="16" step="1" value="16">
         </div>
 
         <div class="combo-visual-container" style="margin-top: 10px;">
             <div class="columna-mitad">
-                <div id="mapa-fase3" class="mapa-impacto-box"></div>
+                <div id="mapa-fase3"></div>
             </div>
             
             <div class="columna-mitad">
-                <h3 class="anio-titulo" style="font-size: 16px;">Participación Nacional Histórica</h3>
                 <div class="grafico-wrapper">
                     <canvas id="grafico-barras-fase3"></canvas>
                 </div>
             </div>
         </div>
+        <div class="source-note"><strong>Fuente:</strong> INFOGOB, JNE</div>
     </div>
 
-    <footer class="special-credits">
-        <h3>Créditos</h3>
-        <div class="credit-item"><strong>Investigación y análisis de datos:</strong> Jorge Falen</div>
-        <div class="credit-item"><strong>Diseño y desarrollo:</strong> Fabrizio Monge</div>
-        <div class="credit-item"><strong>Asistencia de producción:</strong> Karla Kennedy</div>
-        <div class="credit-item"><strong>Edición General:</strong> Ariana Lira</div>
-    </footer>
+    <footer class="special-credits-black">    
+        <h3 class="credits-main-title">Créditos</h3>
+        
+        <div class="credit-block">
+            <span class="credit-role">Investigación y análisis de datos</span>
+            <span class="credit-name">Jorge Falen</span>
+        </div>
+        
+        <div class="credit-block">
+            <span class="credit-role">Texto</span>
+            <span class="credit-name">Jorge Falen, Gino Alva</span>
+        </div>
+        
+        <div class="credit-block">
+            <span class="credit-role">Diseño y desarrollo</span>
+            <span class="credit-name">Fabrizio Monge</span>
+        </div>
+        
+        <div class="credit-block">
+            <span class="credit-role">Asistencia de producción</span>
+            <span class="credit-name">Karla Kennedy</span>
+        </div>
+        
+        <div class="credit-block">
+            <span class="credit-role">Edición General</span>
+            <span class="credit-name">Ariana Lira</span>
+        </div>
 
-    <script src="app.js" defer></script>
+        <div class="credits-logo-container">
+            <img src="fotos/logo_ecdata.png" alt="Logo ECData" onerror="this.style.display='none'">
+
+        <div class="copyright-text">©2026 Empresa Editora El Comercio. Todos los derechos reservados</div>
+        </div>
+    </footer>
+    <script src="app.js"></script>
 </body>
 </html>
