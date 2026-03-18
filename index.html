@@ -46,6 +46,15 @@
         <p>Pero a pesar de lo complejo de este proceso electoral, tiene más similitudes que diferencias con elecciones anteriores. En los últimos 45 años, en el país hubo un patrón claro: la mayoría de veces, el presidente del Perú se definió en la segunda vuelta.</p>
     </article>
 
+    <div class="instrucciones-caja">
+        <span class="instrucciones-titulo">💡 Cómo interactuar con el mapa:</span>
+        <ul>
+            <li><strong>Viaja en el tiempo:</strong> Disfruta de la reproducción automática para ver la evolución electoral, o usa los controles superiores para pausar y navegar año por año a tu ritmo.</li>
+            <li><strong>Explora los detalles:</strong> Pulsa sobre cada parte del mapa para descubrir qué candidato fue el más votado allí y con qué porcentaje.</li>
+        </ul>
+    </div>
+    <div class="anio-titulo"> Los candidatos más votados por circunscripción electoral (1980-2021)</div>
+    
     <div class="viz-container">
         <div class="controls-container ui-element">
             <button id="restart-btn" class="control-btn" title="Volver al inicio">
@@ -58,7 +67,6 @@
             <button id="play-pause-btn" class="control-btn main-btn">⏸</button>
             <button id="next-btn" class="control-btn" title="Siguiente elección" disabled>⏭</button>
         </div>
-        <div class="anio-titulo"> Los candidatos más votados por circunscripción electoral (1980-2021)</div>
         <div id="year-display" class="ui-element year-label">Cargando...</div>
         <div id="year-note" class="year-context-note"></div>
         <div id="cand-1" class="candidate-big pos-left"></div>
@@ -66,6 +74,7 @@
         <div id="bottom-candidates" class="bottom-legend-container"></div>
         
         <div class="source-note source-fase1"><strong>Fuente:</strong> INFOGOB, JNE</div>
+        <div id="editor-note" class="editor-note-fase1"></div>
         <div id="map"></div>
     </div>
 
@@ -112,9 +121,18 @@
         <p>Lima es la circunscripción electoral más importante en cantidad de electores. Sin embargo, desde el 2006 ningún candidato que ganó en primera vuelta en la capital llegó a Palacio de Gobierno.</p>
     </article>
 
+    <div class="instrucciones-caja">
+        <span class="instrucciones-titulo">💡 Instrucciones de la visualización:</span>
+        <ul>
+            <li><strong>Mapa poblacional electoral:</strong> Así se vería el mapa del Perú si lo dibujáramos con base en la distribución de electores. Pulsa sobre el mapa para ver la cantidad exacta de electores por región en la última elección presidencial (2021).</li>
+            <li><strong>Evolución del padrón:</strong> Explora el gráfico de áreas para descubrir cómo se ha multiplicado el número de votantes en cada macrorregión a lo largo de 40 años.</li>
+            <li><strong>Vistas conectadas:</strong> Interactúa con la leyenda central, el mapa o las líneas del gráfico. Al hacerlo, iluminarás esa macrorregión específica en ambos gráficos para analizarla sin distracciones.</li>
+        </ul>
+    </div>
+
     <div class="combo-visual-container">
         <div class="columna-mitad">
-            <div class="anio-titulo">El peso real hoy (2021)</div>
+            <div class="anio-titulo">Mapa poblacional electoral (2021)</div>
             <div id="mapa-impacto" class="mapa-impacto-box"></div>
         </div>
         
@@ -122,7 +140,7 @@
             </div>
 
         <div class="columna-mitad">
-            <div class="anio-titulo">Electores absolutos (1980 - 2021)</div>
+            <div class="anio-titulo">Evolución del padrón (1980-2021)</div>
             <div class="grafico-wrapper">
                 <canvas id="grafico-areas"></canvas>
             </div>
@@ -141,14 +159,22 @@
         <p>Los picos más altos se registraron en 1985 y el 2006 (primera vuelta), con 91% y 89%, respectivamente.</p>
         <p>Pero, precisamente desde el 2006, la participación de los electores ha disminuido de forma constante. El mínimo se registró en la primera vuelta del 2021, con 71% en la primera vuelta. En ese entonces, el mundo aún enfrentaba una emergencia sanitaria por el COVID–19.</p>
     </article>
-    
+
+    <div class="instrucciones-caja">
+        <span class="instrucciones-titulo">💡 Instrucciones de la visualización:</span>
+        <ul>
+            <li><strong>Línea de tiempo:</strong> Mueve el deslizador superior para viajar entre 1980 y 2021 y ver cómo los tonos de azul cambian según la participación ciudadana. Mientras más azul, mayor participación.</li>
+            <li><strong>Radiografía regional:</strong> Pulsa sobre cualquier parte del mapa para conocer el porcentaje exacto de asistencia a las urnas en cada lugar.</li>
+            <li><strong>Vistas conectadas:</strong>Haz clic en cualquier columna del gráfico de barras de la derecha para saltar directamente a esa elección y actualizar el mapa al instante.</li>
+        </ul>
+    </div>    
     <div class="participacion-wrapper">
         <div class="slider-container">
             <div class="fase3-title" id="fase3-year-display">Cargando...</div>
             <input type="range" id="slider-fase3" class="custom-slider" min="0" max="16" step="1" value="16">
         </div>
 
-        <div class="combo-visual-container" style="margin-top: 10px;">
+        <div class="combo-visual-container fase3-combo" style="margin-top: 10px">
             <div class="columna-mitad">
                 <div class="anio-titulo">Participación electoral por región (%)</div>
                 <div id="mapa-fase3"></div>
@@ -161,7 +187,7 @@
                 </div>
             </div>
         </div>
-        <div class="source-note"><strong>Fuente:</strong> INFOGOB, JNE</div>
+        <div class="source-note source-fase3"><strong>Fuente:</strong> INFOGOB, JNE</div>
     </div>    
 
     <article class="story-text">
