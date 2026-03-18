@@ -170,11 +170,11 @@ body, html {
 .viz-container {
     position: relative;
     width: 100%;
-    height: 980px; 
-    min-height: 980px; 
-    background-color: transparent; /* Seamless: sin recuadro gris */
+    height: 860px;     /* <--- Reducimos de 980px a 850px */
+    min-height: 860px; /* <--- Reducimos de 980px a 850px */
+    background-color: transparent; 
     overflow: hidden; 
-    margin: 30px 0; 
+    margin: 10px 0 30px 0; 
 }
 #map {
     width: 100%; height: 100%; background-color: transparent !important;
@@ -189,8 +189,10 @@ body, html {
     font-weight: 900; text-transform: uppercase;
     box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
 }
+
 .controls-container {
-    top: 20px; left: 20px;
+    top: 20px; /* <--- Se alinea con la misma altura de la etiqueta del año */
+    left: 19%;  /* <--- Se alinea exactamente con la posición (pos-left) del candidato grande */
     display: flex;
     padding: 0; 
     border: 1.5px solid #ccc !important; 
@@ -198,6 +200,7 @@ body, html {
     overflow: hidden; 
     box-shadow: 2px 2px 5px rgba(0,0,0,0.1) !important;
 }
+
 .control-btn {
     background: white;
     border: none;
@@ -234,7 +237,8 @@ body, html {
     color: #fff;
 }
 .year-label {
-    top: 20px; left: 50%; transform: translateX(-50%);
+    top: 20px; /* <--- Bajamos de 20px a 55px para alejarlo del título */
+    left: 50%; transform: translateX(-50%);
     padding: 10px 20px; font-size: 18px;
 }
 
@@ -251,8 +255,8 @@ body, html {
     position: absolute; z-index: 2500; top: 50%; transform: translateY(-50%);
     width: 250px; text-align: center; align-items: center; display: flex; flex-direction: column;
 }
-.pos-left { left: 8%; }
-.pos-right { right: 8%; }
+.pos-left { left: 17%; }  /* <--- Aumentamos de 8% a 15% */
+.pos-right { right: 17%; } /* <--- Aumentamos de 8% a 15% */
 .candidate-big .photo {
     width: 170px; height: 170px; border-radius: 50%;
     background-color: transparent; 
@@ -268,7 +272,7 @@ body, html {
 
 .bottom-legend-container {
     position: absolute; 
-    bottom: 50px; 
+    bottom: 60px; /* <--- Lo subimos a 60px */
     left: 50%; transform: translateX(-50%);
     z-index: 2500; display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;
 }
@@ -305,7 +309,7 @@ body, html {
     background-position: center; 
     background-repeat: no-repeat;
     background-color: #eeeeee; 
-    border: 2px solid #444; 
+    border: 1px solid rgba(0, 0, 0, 0.15);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     margin-bottom: 5px;
     transition: background-color 0.4s ease-in-out !important;
@@ -496,25 +500,37 @@ body, html {
     .candidate-small .dot { display: none; } 
     
     /* Fuente al final de todo y centrada */
-    .source-fase1 { 
-        bottom: 100px; /* Pegada al ras del piso del contenedor */
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 9px; 
-        color: #777; 
-        text-shadow: none; 
-        background: transparent; 
-        padding: 0;
-        z-index: 3000;
-        width: 100%;
-        text-align: center;
+
+    .source-fase1 {
+    position: absolute;
+    bottom: 30px; /* <--- Subimos de 15px a 30px para hacer espacio a la nota del editor */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3000;
+    margin: 0;
+    width: 90%;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.9), -1px -1px 2px rgba(255, 255, 255, 0.9);
     }
+
+    .editor-note-fase1 {
+    position: absolute;
+    bottom: 10px; /* Queda perfectamente alineada debajo de la fuente */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3000;
+    width: 90%;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    font-size: 11px;
+    color: #555;
+    display: none; /* Se mantiene oculta por defecto hasta que el Javascript la active */
+}
 
     /* Ajustes para el mundito (Extranjero) en celular */
     .pex-globe {
         width: 45px !important;
         height: 45px !important;
-        border-width: 1px;
+        border:1px solid rgba(0, 0, 0, 0.15) !important;
         margin-bottom: 2px;
     }
     .pex-label {
@@ -752,7 +768,6 @@ path.leaflet-interactive {
     }
 }
 
-
 /* =========================================
    14. FUENTE DE DATOS (CREDITOS VISUALES)
    ========================================= */
@@ -770,7 +785,7 @@ path.leaflet-interactive {
 /* Regla especial solo para la fuente del mapa de la Fase 1 */
 .source-fase1 {
     position: absolute;
-    bottom: 15px;
+    bottom: 30px; /* <--- Lo subimos a 30px */
     left: 50%;
     transform: translateX(-50%);
     z-index: 3000;
@@ -779,9 +794,101 @@ path.leaflet-interactive {
     text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.9), -1px -1px 2px rgba(255, 255, 255, 0.9);
 }
 
+/* NUEVA REGLA: Nota del editor global (Alineada al fondo) */
+.editor-note-fase1 {
+    position: absolute;
+    bottom: 10px; /* <--- Lo subimos a 10px (¡Ya no se cortará!) */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3000;
+    width: 90%;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    font-size: 11px;
+    color: #555;
+    display: none; /* Se mantiene oculta por defecto hasta que JS la active */
+}
+
+/* Ajustes de espaciado Fase 3 (Solo Escritorio) */
+.fase3-combo {
+    margin-top: 10px;
+    margin-bottom: -75px; /* Acerca la fuente al gráfico en PC */
+}
+
+.source-fase3 {
+    margin-top: 20px; /* Quita el espacio superior en PC */
+}
+
+/* Salvavidas para Celulares: Devolvemos el espacio para que los años no choquen */
+@media (max-width: 850px) {
+    .fase3-combo {
+        margin-bottom: 10px !important; /* Le devuelve el aire por debajo al gráfico */
+    }
+    .source-fase3 {
+        margin-top: 95px !important; /* Separa un poco la fuente hacia abajo */
+        margin-bottom: -40px;
+    }
+}
+
+/* Reglas EXCLUSIVAS para celulares */
 @media (max-width: 768px) {
     .source-fase1 {
         bottom: 10px;
         font-size: 10px;
+    }
+}
+
+/* =========================================
+   CAJA DE INSTRUCCIONES DEL MAPA
+   ========================================= */
+.instrucciones-caja {
+    max-width: 650px;
+    margin: 10px auto 30px auto;
+    background-color: #f9f9f9;
+    border: 1px solid #eaeaea;
+    border-left: 4px solid #111; /* Una barra negra elegante a la izquierda */
+    padding: 15px 20px;
+    border-radius: 0 4px 4px 0;
+    font-family: 'Arial', sans-serif;
+}
+
+.instrucciones-titulo {
+    color: #111;
+    font-weight: 900;
+    font-size: 15px;
+    display: block;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.instrucciones-caja ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.instrucciones-caja li {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    color: #444;
+}
+
+.instrucciones-caja li:last-child {
+    margin-bottom: 0;
+}
+
+.instrucciones-caja li strong {
+    color: #111;
+}
+
+/* Ajuste ligero para celulares */
+@media (max-width: 768px) {
+    .instrucciones-caja {
+        margin: 10px 20px 20px 20px;
+        padding: 12px 15px;
+    }
+    .instrucciones-caja li {
+        font-size: 13px;
     }
 }
