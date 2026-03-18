@@ -1,19 +1,36 @@
-// Variable para detectar si es celular al cargar la página
+// Variable global y Panel de Configuración Modular
 const esMovil = window.innerWidth <= 768;
+
+const CONFIG = {
+    archivos: {
+        regiones: "Ganadores_elecciones.csv",
+        nacion: "Resumen_eleccion_nacion.csv"
+    },
+    animacion: {
+        velocidad: 3000
+    },
+    colores: {
+        defecto: "#eeeeee",
+        macro: {
+            "ORIENTE": "#0047ab",
+            "NORTE": "#E53935",
+            "CENTRO": "#4caf50",
+            "SUR": "#9b59b6",
+            "LIMA Y CALLAO": "#f1c40f"
+        }
+    }
+};
 
 // ===============================================
 // BLOQUE 1: MAPA PRINCIPAL INTERACTIVO (FASE 1)
 // ===============================================
-const ARCHIVOS = { regiones: "Ganadores_elecciones.csv", nacion: "Resumen_eleccion_nacion.csv" };
-const VELOCIDAD_ANIMACION = 3000; 
-const COLOR_DEFECTO = "#eeeeee";
 
 const map = L.map('map', {
     zoomControl: false, dragging: false, scrollWheelZoom: false,
     doubleClickZoom: false, touchZoom: false, attributionControl: false, zoomSnap: 0 
 }).setView(
-    esMovil ? [-12.0, -75.0] : [-10.0, -76.5], // Coordenadas (Móvil vs Desktop)
-    esMovil ? 4.4 : 5.55                     // Zoom (Móvil vs Desktop)
+    esMovil ? [-12.0, -75.0] : [-10.0, -76.5], 
+    esMovil ? 4.4 : 5.55                     
 );
 
 let elecciones = {}, periodos = [], currentIndex = 0;
@@ -40,7 +57,7 @@ const generarLabel = (anio, vueltaStr) => {
 const getStyle = (name) => {
     const n = name ? name.toUpperCase().trim() : "";
     const elec = elecciones[periodos[currentIndex]];
-    const fillColor = (elec && elec.mapa[n]) ? elec.mapa[n].color : COLOR_DEFECTO;
+    const fillColor = (elec && elec.mapa[n]) ? elec.mapa[n].color : CONFIG.colores.defecto;
     return { fillColor: fillColor, weight: 0.8, opacity: 1, color: "#444444", fillOpacity: 1 };
 };
 
@@ -107,9 +124,10 @@ function updateLegend() {
     }, "");
 }
 
+// Inicialización de datos con manejador de errores
 Promise.all([
-    new Promise(res => Papa.parse(ARCHIVOS.regiones, { download: true, header: true, skipEmptyLines: true, delimiter: ";", transformHeader: h => h.replace(/^\uFEFF/, '').trim().toLowerCase(), complete: res })),
-    new Promise(res => Papa.parse(ARCHIVOS.nacion, { download: true, header: true, skipEmptyLines: true, delimiter: ";", transformHeader: h => h.replace(/^\uFEFF/, '').trim().toLowerCase(), complete: res }))
+    new Promise(res => Papa.parse(CONFIG.archivos.regiones, { download: true, header: true, skipEmptyLines: true, delimiter: ";", transformHeader: h => h.replace(/^\uFEFF/, '').trim().toLowerCase(), complete: res })),
+    new Promise(res => Papa.parse(CONFIG.archivos.nacion, { download: true, header: true, skipEmptyLines: true, delimiter: ";", transformHeader: h => h.replace(/^\uFEFF/, '').trim().toLowerCase(), complete: res }))
 ]).then(results => {
     const [regionesData, nacionData] = results;
 
@@ -147,7 +165,7 @@ Promise.all([
         if (region.includes("EXTRANJERO")) region = "EXTRANJERO";
 
         elecciones[label].mapa[region] = { 
-            color: (row['color'] || "").trim() || COLOR_DEFECTO, 
+            color: (row['color'] || "").trim() || CONFIG.colores.defecto, 
             partido: (row["organización política"] || row["organizacion politica"] || "").trim(), 
             pct: row["%_votos_validos"] || "" 
         };
@@ -169,8 +187,7 @@ Promise.all([
             L.marker([-8.5, -82.75], { icon: L.divIcon({ className: 'pex-label', html: 'CALLAO', iconSize: [100, 20], iconAnchor: [50, 10] }), interactive: false }).addTo(map);
         }
 
-        // Le damos coordenadas distintas si es móvil o si es PC
-        const coordMundito = esMovil ? [-17.5, -81.5] : [-16.0, -81.5]; // Más al sur en celular (-19.5)
+        const coordMundito = esMovil ? [-17.5, -81.5] : [-16.0, -81.5]; 
         const coordPopupMundito = esMovil ? [-18.2, -81.5] : [-14.7, -81.5];
 
         pexLayer = L.marker(coordMundito, { icon: L.divIcon({ className: 'pex-globe-container', html: '<div class="pex-globe"></div><div class="pex-label">Peruanos en<br>el extranjero</div>', iconSize: [120, 100], iconAnchor: [60, 50] }) }).addTo(map);
@@ -183,6 +200,9 @@ Promise.all([
         actualizarPantalla();
         iniciarAnimacion();
     });
+}).catch(error => {
+    console.error("Error crítico cargando los datos electorales:", error);
+    document.getElementById("year-display").innerText = "⚠️ Error cargando datos.";
 });
 
 function actualizarPantalla() {
@@ -198,27 +218,24 @@ function actualizarPantalla() {
     if (globe) {
         let currentElec = elecciones[periodos[currentIndex]];
         let d = currentElec ? currentElec.mapa["EXTRANJERO"] : null;
-        let colorFondo = (d && d.color && d.color !== COLOR_DEFECTO) ? d.color : 'transparent';
+        let colorFondo = (d && d.color && d.color !== CONFIG.colores.defecto) ? d.color : 'transparent';
 
-        // TRUCO DE INVERSIÓN PARA 1980 (Candidato de color negro)
         if (periodos[currentIndex].includes("1980")) {
-            globe.style.backgroundColor = "#ffffff"; // Le damos fondo blanco...
+            globe.style.backgroundColor = "#ffffff"; 
             globe.style.filter = "invert(1)";
         } else {
-            globe.style.backgroundColor = colorFondo; // Color normal para el resto de años
-            globe.style.filter = "none";              // Sin inversión
+            globe.style.backgroundColor = colorFondo; 
+            globe.style.filter = "none";              
         }
     }
 
     updateLegend();
 
-// NUEVA LÓGICA PARA EL CONTEXTO HISTÓRICO Y NOTA DEL EDITOR
     const noteContainer = document.getElementById("year-note");
     const editorNoteContainer = document.getElementById("editor-note");
 
     if (periodos[currentIndex].includes("2000")) {
         if (esMovil) {
-            // DISEÑO CELULARES: Se mantiene el Pop-up y se apaga la nota del pie
             noteContainer.innerHTML = `
                 <div id="btn-contexto-movil" style="cursor:pointer; font-weight:900; color:#111; text-align:center;">
                     Mostrar contexto histórico 
@@ -230,7 +247,6 @@ function actualizarPantalla() {
             noteContainer.style.display = "block";
             if (editorNoteContainer) editorNoteContainer.style.display = "none";
             
-            // Lógica para abrir/cerrar al tocar
             document.getElementById("btn-contexto-movil").addEventListener("click", function() {
                 const texto = document.getElementById("texto-contexto-movil");
                 if (texto.style.display === "none") {
@@ -242,7 +258,6 @@ function actualizarPantalla() {
                 }
             });
         } else {
-            // DISEÑO PC: Apaga la caja flotante y enciende la Nota del Editor abajo
             noteContainer.style.display = "none";
             if (editorNoteContainer) {
                 editorNoteContainer.innerHTML = "<strong>Nota del editor:</strong> Las elecciones generales del año 2000, que culminaron en la re-reelección de Alberto Fujimori, recibieron serios señalamientos de fraude por parte de organismos internacionales.";
@@ -250,7 +265,6 @@ function actualizarPantalla() {
             }
         }
     } else {
-        // SI NO ES EL AÑO 2000: Oculta ambos contenedores
         noteContainer.style.display = "none";
         if (editorNoteContainer) editorNoteContainer.style.display = "none";
     }
@@ -264,7 +278,7 @@ function avanzarFrame() { currentIndex = (currentIndex + 1) % periodos.length; a
 function retrocederFrame() { currentIndex = (currentIndex - 1 + periodos.length) % periodos.length; actualizarPantalla(); }
 
 function iniciarAnimacion() { 
-    timerInterval = setInterval(avanzarFrame, VELOCIDAD_ANIMACION); 
+    timerInterval = setInterval(avanzarFrame, CONFIG.animacion.velocidad); 
     isPlaying = true; btnPlayPause.innerHTML = "⏸"; 
     btnPrev.disabled = true; btnNext.disabled = true;
 }
@@ -282,7 +296,7 @@ btnPrev.addEventListener("click", () => { if (!isPlaying) retrocederFrame(); });
 btnRestart.addEventListener("click", () => {
     currentIndex = 0; actualizarPantalla();
     if (!isPlaying) iniciarAnimacion();
-    else { clearInterval(timerInterval); timerInterval = setInterval(avanzarFrame, VELOCIDAD_ANIMACION); }
+    else { clearInterval(timerInterval); timerInterval = setInterval(avanzarFrame, CONFIG.animacion.velocidad); }
 });
 
 // ===============================================
@@ -316,14 +330,6 @@ const dataRegiones2021 = {
     "UCAYALI": { macro: "ORIENTE", electores: 389889 }
 };
 
-const coloresMacro = {
-    "ORIENTE": "#0047ab",
-    "NORTE": "#E53935",
-    "CENTRO": "#4caf50",
-    "SUR": "#9b59b6",
-    "LIMA Y CALLAO": "#f1c40f"
-};
-
 // ===============================================
 // BLOQUE 3: MAPA DE IMPACTO (FASE 2)
 // ===============================================
@@ -332,10 +338,9 @@ const staticOptionsImpacto = {
     doubleClickZoom: false, touchZoom: false, attributionControl: false, zoomSnap: 0
 };
 
-// ¡Actualizado con zoom condicional para móviles!
 const mapaImpacto = L.map('mapa-impacto', staticOptionsImpacto).setView(
-    esMovil ? [-9.0, -75.0] : [-9.5, -74.5], // Coordenadas (Móvil vs Desktop)
-    esMovil ? 5.0 : 5.4                      // Zoom (Móvil vs Desktop)
+    esMovil ? [-9.0, -75.0] : [-9.5, -74.5], 
+    esMovil ? 5.0 : 5.4                      
 );
 let capaCartograma;
 
@@ -344,9 +349,9 @@ function sincronizarFoco(macroObjetivo, origen = 'otro') {
         capaCartograma.eachLayer(layer => {
             const data = dataRegiones2021[layer.feature.properties.NOMBDEP];
             if (!macroObjetivo) {
-                layer.setStyle({ fillColor: coloresMacro[data.macro], fillOpacity: 0.85, opacity: 1, color: "#ffffff" });
+                layer.setStyle({ fillColor: CONFIG.colores.macro[data.macro], fillOpacity: 0.85, opacity: 1, color: "#ffffff" });
             } else if (data && data.macro === macroObjetivo) {
-                layer.setStyle({ fillColor: coloresMacro[data.macro], fillOpacity: 1, opacity: 1, color: "#ffffff" }); 
+                layer.setStyle({ fillColor: CONFIG.colores.macro[data.macro], fillOpacity: 1, opacity: 1, color: "#ffffff" }); 
             } else {
                 layer.setStyle({ fillColor: '#e5e5e5', fillOpacity: 0.7, opacity: 1, color: "#ffffff" }); 
             }
@@ -358,8 +363,8 @@ function sincronizarFoco(macroObjetivo, origen = 'otro') {
 
         window.graficoAreas.data.datasets.forEach((dataset, index) => {
             if (!macroObjetivo || dataset.label === macroObjetivo) {
-                dataset.backgroundColor = coloresMacro[dataset.label];
-                dataset.borderColor = coloresMacro[dataset.label];
+                dataset.backgroundColor = CONFIG.colores.macro[dataset.label];
+                dataset.borderColor = CONFIG.colores.macro[dataset.label];
                 if (dataset.label === macroObjetivo) targetDatasetIndex = index;
             } else {
                 dataset.backgroundColor = '#eaeaea'; 
@@ -396,7 +401,7 @@ function onEachFeatureImpacto(feature, layer) {
         const electoresFmt = new Intl.NumberFormat('es-PE').format(data.electores);
         layer.bindPopup(`
             <div class="popup-region">${regionNombre}</div>
-            <div class="popup-party" style="font-weight:bold; color: ${coloresMacro[data.macro]};">MACRORREGIÓN ${data.macro}</div>
+            <div class="popup-party" style="font-weight:bold; color: ${CONFIG.colores.macro[data.macro]};">MACRORREGIÓN ${data.macro}</div>
             <div class="popup-pct">${electoresFmt} <span class="popup-pct-label">(electores)</span></div>
         `, { closeButton: false });
 
@@ -413,11 +418,11 @@ fetch("mapa_2021_def.geojson")
         capaCartograma = L.geoJSON(data, {
             style: (feature) => {
                 const macro = dataRegiones2021[feature.properties.NOMBDEP]?.macro;
-                return { fillColor: coloresMacro[macro] || "#ccc", weight: 1.5, opacity: 1, color: "#ffffff", fillOpacity: 0.85 };
+                return { fillColor: CONFIG.colores.macro[macro] || "#ccc", weight: 1.5, opacity: 1, color: "#ffffff", fillOpacity: 0.85 };
             },
             onEachFeature: onEachFeatureImpacto
         }).addTo(mapaImpacto);
-    });
+    }).catch(error => console.error("Error cargando mapa Fase 2:", error));
 
 // ===============================================
 // BLOQUE 4: GRÁFICO DE ÁREAS Y LEYENDA (FASE 2)
@@ -429,11 +434,11 @@ window.graficoAreas = new Chart(ctxImpacto, {
     data: {
         labels: ['1980', '2001', '2021'],
         datasets: [
-            { label: 'LIMA Y CALLAO', data: [2571748, 5549649, 9147140], borderColor: coloresMacro['LIMA Y CALLAO'], backgroundColor: coloresMacro['LIMA Y CALLAO'], fill: true, pointRadius: 4, pointHoverRadius: 6 },
-            { label: 'NORTE', data: [1518390, 3619731, 5960856], borderColor: coloresMacro['NORTE'], backgroundColor: coloresMacro['NORTE'], fill: true, pointRadius: 4, pointHoverRadius: 6 },
-            { label: 'SUR', data: [1150253, 2569392, 4175269], borderColor: coloresMacro['SUR'], backgroundColor: coloresMacro['SUR'], fill: true, pointRadius: 4, pointHoverRadius: 6 },
-            { label: 'CENTRO', data: [862783, 1846016, 2858774], borderColor: coloresMacro['CENTRO'], backgroundColor: coloresMacro['CENTRO'], fill: true, pointRadius: 4, pointHoverRadius: 6 },
-            { label: 'ORIENTE', data: [328447, 1065762, 2148882], borderColor: coloresMacro['ORIENTE'], backgroundColor: coloresMacro['ORIENTE'], fill: true, pointRadius: 4, pointHoverRadius: 6 }
+            { label: 'LIMA Y CALLAO', data: [2571748, 5549649, 9147140], borderColor: CONFIG.colores.macro['LIMA Y CALLAO'], backgroundColor: CONFIG.colores.macro['LIMA Y CALLAO'], fill: true, pointRadius: 4, pointHoverRadius: 6 },
+            { label: 'NORTE', data: [1518390, 3619731, 5960856], borderColor: CONFIG.colores.macro['NORTE'], backgroundColor: CONFIG.colores.macro['NORTE'], fill: true, pointRadius: 4, pointHoverRadius: 6 },
+            { label: 'SUR', data: [1150253, 2569392, 4175269], borderColor: CONFIG.colores.macro['SUR'], backgroundColor: CONFIG.colores.macro['SUR'], fill: true, pointRadius: 4, pointHoverRadius: 6 },
+            { label: 'CENTRO', data: [862783, 1846016, 2858774], borderColor: CONFIG.colores.macro['CENTRO'], backgroundColor: CONFIG.colores.macro['CENTRO'], fill: true, pointRadius: 4, pointHoverRadius: 6 },
+            { label: 'ORIENTE', data: [328447, 1065762, 2148882], borderColor: CONFIG.colores.macro['ORIENTE'], backgroundColor: CONFIG.colores.macro['ORIENTE'], fill: true, pointRadius: 4, pointHoverRadius: 6 }
         ]
     },
     options: {
@@ -461,14 +466,14 @@ document.getElementById('grafico-areas').addEventListener('mouseleave', () => si
 const contenedorLeyenda = document.getElementById('leyenda-compartida');
 if (contenedorLeyenda) {
     contenedorLeyenda.innerHTML = ''; 
-    Object.keys(coloresMacro).forEach(macro => {
+    Object.keys(CONFIG.colores.macro).forEach(macro => {
         const item = document.createElement('div');
         item.className = 'leyenda-item';
         item.id = `leyenda-${macro}`;
         
         const colorBox = document.createElement('div');
         colorBox.className = 'leyenda-color';
-        colorBox.style.backgroundColor = coloresMacro[macro];
+        colorBox.style.backgroundColor = CONFIG.colores.macro[macro];
         
         const texto = document.createElement('span');
         texto.innerText = macro;
@@ -521,12 +526,12 @@ const participacionRegiones = {
 
 const obtenerColorAzul = (valor) => {
     if (valor === null || valor === undefined) return "#e0e0e0"; 
-    if (valor >= 85) return "#002868"; // Azul muy oscuro
-    if (valor >= 80) return "#0047ab"; // TU AZUL BASE
-    if (valor >= 75) return "#3a75c4"; // Azul medio
-    if (valor >= 65) return "#75a3dd"; // Azul claro
-    if (valor >= 50) return "#b0d0f5"; // Azul muy claro
-    return "#e6f0fa";                  // Casi blanco para muy baja participación
+    if (valor >= 85) return "#002868"; 
+    if (valor >= 80) return "#0047ab"; 
+    if (valor >= 75) return "#3a75c4"; 
+    if (valor >= 65) return "#75a3dd"; 
+    if (valor >= 50) return "#b0d0f5"; 
+    return "#e6f0fa";                  
 };
 
 let indexActualFase3 = 16; 
@@ -534,21 +539,15 @@ const mapaFase3 = L.map('mapa-fase3', {
     zoomControl: false, dragging: false, scrollWheelZoom: false,
     doubleClickZoom: false, touchZoom: false, attributionControl: false, zoomSnap: 0
 }).setView(
-    esMovil ? [-9.0, -75.0] : [-11.0, -76.5], // Coordenadas (Móvil vs Desktop)
-    esMovil ? 4.3 : 4.8                      // Zoom (Móvil vs Desktop)
+    esMovil ? [-9.0, -75.0] : [-11.0, -76.5], 
+    esMovil ? 4.3 : 4.8                      
 );
 
 let capaGeoJsonFase3, callaoInsetFase3, pexLayerFase3;
 
 function repintarMapaFase3() {
     const estiloBase = (valor) => {
-        return {
-            fillColor: obtenerColorAzul(valor),
-            weight: 0.8,
-            opacity: 1,
-            color: "#444444", 
-            fillOpacity: 0.95
-        };
+        return { fillColor: obtenerColorAzul(valor), weight: 0.8, opacity: 1, color: "#444444", fillOpacity: 0.95 };
     };
 
     if (capaGeoJsonFase3) {
@@ -611,13 +610,9 @@ fetch("mapa.geojson").then(res => res.json()).then(data => {
         }).addTo(mapaFase3);
         
         L.polyline([[-10.8, -82.2], [-12.05, -77.50]], { color: "#999", weight: 1, dashArray: "4, 4" }).addTo(mapaFase3);
-        L.marker([-8.5, -82.75], { 
-            icon: L.divIcon({ className: 'pex-label', html: 'CALLAO', iconSize: [100, 20], iconAnchor: [50, 10] }), 
-            interactive: false 
-        }).addTo(mapaFase3);
+        L.marker([-8.5, -82.75], { icon: L.divIcon({ className: 'pex-label', html: 'CALLAO', iconSize: [100, 20], iconAnchor: [50, 10] }), interactive: false }).addTo(mapaFase3);
     }
 
-    // Hacemos lo mismo para el mapa de participación
     const coordMunditoFase3 = esMovil ? [-19.5, -81.5] : [-15.5, -81.5];
     const coordPopupMunditoFase3 = esMovil ? [-18.2, -81.5] : [-14.2, -81.5];
 
@@ -636,7 +631,7 @@ fetch("mapa.geojson").then(res => res.json()).then(data => {
     pexLayerFase3.on('mouseout', () => mapaFase3.closePopup());
     
     repintarMapaFase3(); 
-});
+}).catch(error => console.error("Error cargando mapa Fase 3:", error));
 
 const labelsFase3 = [
     '1980', '1985', '1990 (1)', '1990 (2)', '1995', 
@@ -659,34 +654,14 @@ const graficoNacion = new Chart(ctxFase3, {
         }]
     },
     options: {
-        responsive: true, 
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         plugins: {
             legend: { display: false },
-            tooltip: { 
-                callbacks: { 
-                    title: (context) => periodosFase3[context[0].dataIndex], 
-                    label: (context) => ` ${context.parsed.y}%` 
-                } 
-            }
+            tooltip: { callbacks: { title: (context) => periodosFase3[context[0].dataIndex], label: (context) => ` ${context.parsed.y}%` } }
         },
         scales: {
-            x: { 
-                grid: { display: false },
-                ticks: {
-                    maxRotation: 90,
-                    minRotation: 90,
-                    font: { size: 11 }
-                }
-            },
-            y: { 
-                beginAtZero: true,
-                max: 100, 
-                ticks: { 
-                    stepSize: 20,
-                    callback: value => value + '%' 
-                } 
-            }
+            x: { grid: { display: false }, ticks: { maxRotation: 90, minRotation: 90, font: { size: 11 } } },
+            y: { beginAtZero: true, max: 100, ticks: { stepSize: 20, callback: value => value + '%' } }
         },
         onClick: (event, elements) => {
             if (elements.length > 0) {
